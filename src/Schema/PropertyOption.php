@@ -6,6 +6,9 @@ namespace Spiral\JsonSchemaGenerator\Schema;
 
 use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
 
+/**
+ * @internal
+ */
 final class PropertyOption
 {
     /**

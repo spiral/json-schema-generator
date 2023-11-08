@@ -23,7 +23,7 @@ final class Property implements \JsonSerializable
         public readonly mixed $default = null,
     ) {
         if (\is_string($this->type) && !\class_exists($this->type)) {
-            throw new InvalidTypeException('Invalid type definition');
+            throw new InvalidTypeException('Invalid type definition.');
         }
 
         $this->options = new PropertyOptions($options);
@@ -78,12 +78,12 @@ final class Property implements \JsonSerializable
     {
         $dependencies = [];
         foreach ($this->options->getOptions() as $option) {
-            if (is_string($option->value)) {
+            if (\is_string($option->value)) {
                 $dependencies[] = $option->value;
             }
         }
 
-        if (is_string($this->type)) {
+        if (\is_string($this->type)) {
             $dependencies[] = $this->type;
         }
 

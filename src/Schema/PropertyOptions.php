@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\JsonSchemaGenerator\Schema;
 
 /**
+ * @internal
  * @implements \ArrayAccess<int, PropertyOption>
  */
 final class PropertyOptions implements \Countable, \ArrayAccess, \JsonSerializable
@@ -17,9 +18,8 @@ final class PropertyOptions implements \Countable, \ArrayAccess, \JsonSerializab
     /**
      * @param array<class-string|Type> $options
      */
-    public function __construct(
-        array $options = [],
-    ) {
+    public function __construct(array $options = [])
+    {
         foreach ($options as $option) {
             $this->options[] = new PropertyOption($option);
         }

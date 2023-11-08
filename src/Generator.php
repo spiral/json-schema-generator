@@ -53,13 +53,13 @@ class Generator implements GeneratorInterface
             }
 
             // does it refer to any other classes
-            $dependencies = array_merge($dependencies, $psc->getDependencies());
+            $dependencies = [...$dependencies, ...$psc->getDependencies()];
 
             $schema->addProperty($property->getName(), $psc);
         }
 
         // Generating dependencies
-        $dependencies = array_unique($dependencies);
+        $dependencies = \array_unique($dependencies);
         $rollingDependencies = [];
         $doneDependencies = [];
 
@@ -79,8 +79,8 @@ class Generator implements GeneratorInterface
                 $schema->addDefinition($rdf->getShortName(), $definition);
             }
 
-            $doneDependencies = array_merge($doneDependencies, $dependencies);
-            $rollingDependencies = array_diff($rollingDependencies, $doneDependencies);
+            $doneDependencies = [...$doneDependencies, ...$dependencies];
+            $rollingDependencies = \array_diff($rollingDependencies, $doneDependencies);
             if ($rollingDependencies === []) {
                 break;
             }
@@ -110,11 +110,7 @@ class Generator implements GeneratorInterface
                 $options[] = $value->value;
             }
 
-            return new Definition(
-                type: $rf->getName(),
-                options: $options,
-                title: $rf->getShortName(),
-            );
+            return new Definition(type: $rf->getName(), options: $options, title: $rf->getShortName());
         }
 
         $constructor = $rf->getMethod('__construct');
@@ -133,15 +129,11 @@ class Generator implements GeneratorInterface
                 continue;
             }
 
-            $dependencies = array_merge($dependencies, $psc->getDependencies());
+            $dependencies = [...$dependencies, ...$psc->getDependencies()];
             $properties[$property->getName()] = $psc;
         }
 
-        return new Definition(
-            type: $rf->getName(),
-            title: $rf->getShortName(),
-            properties: $properties,
-        );
+        return new Definition(type: $rf->getName(), title: $rf->getShortName(), properties: $properties, );
     }
 
     protected function generateProperty(
@@ -158,10 +150,10 @@ class Generator implements GeneratorInterface
         $description = '';
         $default = null;
 
-        $comment = $property->getAttributes(Field::class);
-        if (count($comment) > 0) {
+        $attribute = $property->getAttributes(Field::class);
+        if ($attribute !== []) {
             /** @var Field $attribute */
-            $attribute = $comment[0]->newInstance();
+            $attribute = $attribute[0]->newInstance();
             $title = $attribute->title;
             $description = $attribute->description;
             $default = $attribute->default;
@@ -192,51 +184,29 @@ class Generator implements GeneratorInterface
                 }
             }
 
-            $required = true;
-            if ($default !== null) {
-                $required = false;
-            }
-
-            if ($type->allowsNull()) {
-                $required = false;
-            }
-
             return new Property(
                 Type::fromBuiltIn($type->getName()),
                 $options,
                 $title,
                 $description,
-                $required,
+                $default === null && !$type->allowsNull(),
                 $default,
             );
         }
 
         // Class or enum
         $class = $type->getName();
-        if (class_exists($class)) {
-            return new Property(
-                $class,
-                [],
-                $title,
-                $description,
-                !$type->allowsNull(),
-                $default,
-            );
-        }
 
-        return null;
+        return \class_exists($class)
+            ? new Property($class, [], $title, $description, !$type->allowsNull(), $default, )
+            : null;
     }
 
     // validates property
     private function validProperty(\ReflectionProperty $property): bool
     {
-        // skipping private and protected properties
-        if ($property->isPrivate() || $property->isProtected()) {
-            return false;
-        }
-
-        // skipping static properties
-        if ($property->isStatic()) {
+        // skipping private, protected, static properties
+        if ($property->isPrivate() || $property->isProtected() || $property->isStatic()) {
             return false;
         }
 
@@ -256,8 +226,8 @@ class Generator implements GeneratorInterface
         // example: /** @var list<Movie> */
         // fetching class name using regex, multiline
         $matches = [];
-        preg_match('/@var\s+list<([a-zA-Z0-9_]+)>/', $property->getDocComment(), $matches);
-        if (count($matches) > 0) {
+        \preg_match('/@var\s+list<([a-zA-Z0-9_]+)>/', $property->getDocComment(), $matches);
+        if (\count($matches) > 0) {
             $className = $matches[1];
 
             return $this->detectType($property, $className);
@@ -265,8 +235,8 @@ class Generator implements GeneratorInterface
 
         // matching @var ClassName[]
         $matches = [];
-        preg_match('/@var\s+([a-zA-Z0-9_]+)\[\]/', $property->getDocComment(), $matches);
-        if (count($matches) > 0) {
+        \preg_match('/@var\s+([a-zA-Z0-9_]+)\[\]/', $property->getDocComment(), $matches);
+        if (\count($matches) > 0) {
             $className = $matches[1];
 
             return $this->detectType($property, $className);

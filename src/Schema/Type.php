@@ -26,9 +26,7 @@ enum Type: string
             'object' => self::Object,
             'array' => self::Array,
             'null' => self::Null,
-            default => throw new \InvalidArgumentException(
-                sprintf('Invalid type %s', $type)
-            ),
+            default => throw new \InvalidArgumentException(\sprintf('Invalid type `%s`.', $type)),
         };
     }
 }
