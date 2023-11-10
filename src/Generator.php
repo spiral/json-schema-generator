@@ -5,27 +5,29 @@ declare(strict_types=1);
 namespace Spiral\JsonSchemaGenerator;
 
 use Spiral\JsonSchemaGenerator\Attribute\Field;
-use Spiral\JsonSchemaGenerator\Exception\GeneratorException;
+use Spiral\JsonSchemaGenerator\Parser\ClassParserInterface;
+use Spiral\JsonSchemaGenerator\Parser\Parser;
+use Spiral\JsonSchemaGenerator\Parser\ParserInterface;
+use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
+use Spiral\JsonSchemaGenerator\Parser\TypeInterface;
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
-use Spiral\JsonSchemaGenerator\Schema\Type;
 
 class Generator implements GeneratorInterface
 {
     protected array $cache = [];
+
+    public function __construct(
+        protected readonly ParserInterface $parser = new Parser(),
+    ) {
+    }
 
     /**
      * @param class-string|\ReflectionClass $class
      */
     public function generate(string|\ReflectionClass $class): Schema
     {
-        if (!$class instanceof \ReflectionClass) {
-            try {
-                $class = new \ReflectionClass($class);
-            } catch (\ReflectionException $e) {
-                throw new GeneratorException($e->getMessage(), $e->getCode(), $e);
-            }
-        }
+        $class = $this->parser->parse($class);
 
         // check cached
         if (isset($this->cache[$class->getName()])) {
@@ -35,19 +37,9 @@ class Generator implements GeneratorInterface
         $schema = new Schema();
 
         $dependencies = [];
-
-        $constructor = $class->getMethod('__construct');
-        $parameters = [];
-        foreach ($constructor->getParameters() as $parameter) {
-            $parameters[$parameter->getName()] = $parameter;
-        }
-
         // Generating properties
         foreach ($class->getProperties() as $property) {
-            $psc = $this->generateProperty(
-                $property,
-                $parameters[$property->getName()] ?? null
-            );
+            $psc = $this->generateProperty($property);
             if ($psc === null) {
                 continue;
             }
@@ -65,18 +57,13 @@ class Generator implements GeneratorInterface
 
         do {
             foreach ($dependencies as $dependency) {
-                try {
-                    $rdf = new \ReflectionClass($dependency);
-                } catch (\ReflectionException $e) {
-                    throw new GeneratorException($e->getMessage(), $e->getCode(), $e);
-                }
-
-                $definition = $this->generateDefinition($rdf, $rollingDependencies);
+                $dependency = $this->parser->parse($dependency);
+                $definition = $this->generateDefinition($dependency, $rollingDependencies);
                 if ($definition === null) {
                     continue;
                 }
 
-                $schema->addDefinition($rdf->getShortName(), $definition);
+                $schema->addDefinition($dependency->getShortName(), $definition);
             }
 
             $doneDependencies = [...$doneDependencies, ...$dependencies];
@@ -94,37 +81,20 @@ class Generator implements GeneratorInterface
         return $schema;
     }
 
-    protected function generateDefinition(
-        \ReflectionClass $rf,
-        array &$dependencies = []
-    ): ?Definition {
-        $options = [];
+    protected function generateDefinition(ClassParserInterface $class, array &$dependencies = []): ?Definition
+    {
         $properties = [];
-
-        if ($rf->isEnum()) {
-            // Getting all constrains
-            foreach ($rf->getReflectionConstants() as $constant) {
-                $value = $constant->getValue();
-                \assert($value instanceof \BackedEnum);
-
-                $options[] = $value->value;
-            }
-
-            return new Definition(type: $rf->getName(), options: $options, title: $rf->getShortName());
-        }
-
-        $constructor = $rf->getMethod('__construct');
-        $parameters = [];
-        foreach ($constructor->getParameters() as $parameter) {
-            $parameters[$parameter->getName()] = $parameter;
+        if ($class->isEnum()) {
+            return new Definition(
+                type: $class->getName(),
+                options: $class->getEnumValues(),
+                title: $class->getShortName()
+            );
         }
 
         // class properties
-        foreach ($rf->getProperties() as $property) {
-            $psc = $this->generateProperty(
-                $property,
-                $parameters[$property->getName()] ?? null
-            );
+        foreach ($class->getProperties() as $property) {
+            $psc = $this->generateProperty($property);
             if ($psc === null) {
                 continue;
             }
@@ -133,27 +103,18 @@ class Generator implements GeneratorInterface
             $properties[$property->getName()] = $psc;
         }
 
-        return new Definition(type: $rf->getName(), title: $rf->getShortName(), properties: $properties, );
+        return new Definition(type: $class->getName(), title: $class->getShortName(), properties: $properties);
     }
 
-    protected function generateProperty(
-        \ReflectionProperty $property,
-        ?\ReflectionParameter $parameter = null
-    ): ?Property {
-        // skipping private and protected properties
-        if (!$this->validProperty($property)) {
-            return null;
-        }
-
+    protected function generateProperty(PropertyInterface $property): ?Property
+    {
         // Looking for Field attribute
         $title = '';
         $description = '';
         $default = null;
 
-        $attribute = $property->getAttributes(Field::class);
-        if ($attribute !== []) {
-            /** @var Field $attribute */
-            $attribute = $attribute[0]->newInstance();
+        $attribute = $property->findAttribute(Field::class);
+        if ($attribute !== null) {
             $title = $attribute->title;
             $description = $attribute->description;
             $default = $attribute->default;
@@ -163,106 +124,26 @@ class Generator implements GeneratorInterface
             $default = $property->getDefaultValue();
         }
 
-        if ($parameter !== null && $property->isPromoted() && $parameter->isDefaultValueAvailable()) {
-            $default = $parameter->getDefaultValue();
-        }
-
-        /**
-         * @var \ReflectionNamedType|null $type
-         */
         $type = $property->getType();
-        if (!$type instanceof \ReflectionNamedType) {
-            return null;
+
+        $options = [];
+        if ($property->isCollection()) {
+            $options = \array_map(
+                static fn (TypeInterface $type) => $type->getName(),
+                $property->getCollectionValueTypes()
+            );
         }
 
+        $required = $default === null && !$type->allowsNull();
         if ($type->isBuiltin()) {
-            $options = [];
-            if ($type->getName() === Type::Array->value) {
-                $class = $this->findListType($property);
-                if ($class !== null) {
-                    $options[] = $class;
-                }
-            }
-
-            return new Property(
-                Type::fromBuiltIn($type->getName()),
-                $options,
-                $title,
-                $description,
-                $default === null && !$type->allowsNull(),
-                $default,
-            );
+            return new Property($type->getName(), $options, $title, $description, $required, $default,);
         }
 
         // Class or enum
         $class = $type->getName();
 
-        return \class_exists($class)
-            ? new Property($class, [], $title, $description, !$type->allowsNull(), $default, )
+        return \is_string($class) && \class_exists($class)
+            ? new Property($class, [], $title, $description, $required, $default)
             : null;
-    }
-
-    // validates property
-    private function validProperty(\ReflectionProperty $property): bool
-    {
-        // skipping private, protected, static properties
-        if ($property->isPrivate() || $property->isProtected() || $property->isStatic()) {
-            return false;
-        }
-
-        // skipping properties with no type, sorry old PHP
-        if (!$property->hasType()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return class-string|Type|null
-     */
-    private function findListType(\ReflectionProperty $property): null|string|Type
-    {
-        // example: /** @var list<Movie> */
-        // fetching class name using regex, multiline
-        $matches = [];
-        \preg_match('/@var\s+list<([a-zA-Z0-9_]+)>/', $property->getDocComment(), $matches);
-        if (\count($matches) > 0) {
-            $className = $matches[1];
-
-            return $this->detectType($property, $className);
-        }
-
-        // matching @var ClassName[]
-        $matches = [];
-        \preg_match('/@var\s+([a-zA-Z0-9_]+)\[\]/', $property->getDocComment(), $matches);
-        if (\count($matches) > 0) {
-            $className = $matches[1];
-
-            return $this->detectType($property, $className);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param \ReflectionProperty $property
-     *
-     * @return class-string|Type
-     */
-    private function detectType(
-        \ReflectionProperty $property,
-        string $name
-    ): string|Type {
-        if (!\str_starts_with($name, '\\')) {
-            $parentNamespace = $property->getDeclaringClass()->getNamespaceName();
-            $className = $parentNamespace . '\\' . $name;
-
-            if (\class_exists($className)) {
-                return $className;
-            }
-        }
-
-        return Type::fromBuiltIn($name);
     }
 }

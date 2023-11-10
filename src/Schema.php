@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spiral\JsonSchemaGenerator;
 
 use Spiral\JsonSchemaGenerator\Schema\Definition;
