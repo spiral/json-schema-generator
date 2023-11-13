@@ -48,20 +48,20 @@ final class GeneratorTest extends TestCase
                     ],
                 ],
                 'required'    => [
-                    0 => 'title',
-                    1 => 'year',
+                    'title',
+                    'year',
                 ],
                 'definitions' => [
                     'ReleaseStatus' => [
                         'title' => 'ReleaseStatus',
                         'type'  => 'string',
                         'enum'  => [
-                            0 => 'Released',
-                            1 => 'Rumored',
-                            2 => 'Post Production',
-                            3 => 'In Production',
-                            4 => 'Planned',
-                            5 => 'Canceled',
+                            'Released',
+                            'Rumored',
+                            'Post Production',
+                            'In Production',
+                            'Planned',
+                            'Canceled',
                         ],
                     ],
                 ],
