@@ -1,6 +1,6 @@
 {
     "name": "spiral/json-schema-generator",
-    "description": "JSON schema generator",
+    "description": "Provides the ability to generate JSON schemas from Data Transfer Object (DTO) classes",
     "keywords": [],
     "homepage": "https://github.com/spiral/json-schema-generator",
     "license": "MIT",
