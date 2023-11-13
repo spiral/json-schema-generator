@@ -170,9 +170,9 @@ final class Actor
 In this example, we use a PHPDoc block to indicate that the property **$movies** contains an array of **Movie** objects.
 
 > **Note**
-> Various documentation type annotations are supported, including **@var array<Movie>**, **@var Movie[]**,
-> and **@var list<Movie>**. For promoted properties, you can use annotations like **@param array<Movie> $movies**,
-> **@param Movie[] $movies**, and **@param list<Movie> $movies**.
+> Various documentation type annotations are supported, including `@var array<Movie>`, `@var Movie[]`,
+> and `@var list<Movie>`. For promoted properties, you can use annotations like `@param array<Movie> $movies`,
+> `@param Movie[] $movies`, and `@param list<Movie> $movies`.
 
 Now, let's generate a schema for this DTO:
 
