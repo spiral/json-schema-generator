@@ -6,6 +6,9 @@ namespace Spiral\JsonSchemaGenerator\Parser;
 
 use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 
+/**
+ * @internal
+ */
 final class Property implements PropertyInterface
 {
     public function __construct(

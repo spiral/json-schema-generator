@@ -12,6 +12,9 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
+/**
+ * @internal
+ */
 final class ClassParser implements ClassParserInterface
 {
     private readonly \ReflectionClass $class;

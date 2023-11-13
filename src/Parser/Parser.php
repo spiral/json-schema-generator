@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Parser;
 
+/**
+ * @internal
+ */
 final class Parser implements ParserInterface
 {
     /**
