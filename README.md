@@ -9,19 +9,18 @@
 [![type-coverage](https://shepherd.dev/github/spiral/json-schema-generator/coverage.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 
-The JSON Schema Generator is a powerful PHP package designed to simplify the process of generating JSON schemas
-from Data Transfer Object (DTO) classes. It supports PHP enumerations, generic type annotations for arrays,
-and provides an attribute for specifying title, description, and default value.
+The JSON Schema Generator is a PHP package that simplifies the generation of JSON schemas from Data Transfer Object (DTO) classes. 
+It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title, description, and default value.
 
 ## Requirements
 
-Make sure that your server is configured with following PHP version and extensions:
+Make sure that your server is configured with the following PHP versions and extensions:
 
 - PHP >=8.1
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via Composer:
 
 ```bash
 composer require spiral/json-schema-generator
@@ -85,8 +84,7 @@ $schema = $generator->generate(Movie::class);
 ```
 
 > **Note**
-> Additionally, the package provides the `Spiral\JsonSchemaGenerator\GeneratorInterface`, which can be seamlessly
-> integrated into your application's dependency container for further customization and flexibility.
+> Additionally, the package provides the `Spiral\JsonSchemaGenerator\GeneratorInterface,` which can be integrated into your application's dependency container for further customization and flexibility.
 
 The `Spiral\JsonSchemaGenerator\Schema` object implements the **JsonSerializable** interface, allowing easy conversion
 of the schema into either JSON or a PHP array.
