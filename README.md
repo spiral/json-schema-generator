@@ -1,4 +1,4 @@
-# JSON schema generator
+# JSON Schema Generator
 
 [![PHP Version Require](https://poser.pugx.org/spiral/json-schema-generator/require/php)](https://packagist.org/packages/spiral/json-schema-generator)
 [![Latest Stable Version](https://poser.pugx.org/spiral/json-schema-generator/v/stable)](https://packagist.org/packages/spiral/json-schema-generator)
