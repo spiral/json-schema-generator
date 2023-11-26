@@ -10,6 +10,8 @@
 The JSON Schema Generator is a PHP package that simplifies the generation of JSON schemas from Data Transfer Object (DTO) classes. 
 It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title, description, and default value.
 
+Main use case - structured output definition for LLMs.
+
 ## Requirements
 
 Make sure that your server is configured with the following PHP versions and extensions:
