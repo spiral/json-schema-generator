@@ -7,7 +7,7 @@
 [![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 
-The JSON Schema Generator is a PHP package that simplifies the generation of JSON schemas from Data Transfer Object (DTO) classes. 
+The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/) from Data Transfer Object (DTO) classes. 
 It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title, description, and default value.
 
 Main use case - structured output definition for LLMs.
