@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<psalm
-        errorLevel="2"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="https://getpsalm.org/schema/config"
-        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-        findUnusedCode="false"
-        findUnusedBaselineEntry="true"
+<psalm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="https://getpsalm.org/schema/config"
+       xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+       errorLevel="2"
+       errorBaseline="psalm-baseline.xml"
+       findUnusedCode="false"
+       findUnusedBaselineEntry="true"
 >
     <projectFiles>
         <directory name="src" />
@@ -14,10 +14,6 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <UndefinedAttributeClass>
-            <errorLevel type="suppress">
-                <referencedClass name="JetBrains\PhpStorm\ExpectedValues" />
-            </errorLevel>
-        </UndefinedAttributeClass>
+        <MissingOverrideAttribute errorLevel="suppress" />
     </issueHandlers>
 </psalm>
