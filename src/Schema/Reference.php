@@ -19,13 +19,8 @@ final class Reference implements \JsonSerializable
 
     public function jsonSerialize(): string
     {
-        if (!\strrpos($this->className, '\\')) {
-            return '#/definitions/' . $this->className;
-        }
+        $pos = \strrpos($this->className, '\\');
 
-        // basename of the class
-        $basename = \substr($this->className, (int) \strrpos($this->className, '\\') + 1);
-
-        return '#/definitions/' . $basename;
+        return '#/definitions/' . ($pos === false ? $this->className : \substr($this->className, $pos + 1));
     }
 }

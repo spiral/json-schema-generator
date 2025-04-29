@@ -46,7 +46,8 @@
     "scripts": {
         "cs:fix": "php-cs-fixer fix -v",
         "test": "phpunit",
-        "psalm": "psalm"
+        "psalm": "psalm",
+        "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml"
     },
     "config": {
         "sort-packages": true
