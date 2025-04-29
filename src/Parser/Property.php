@@ -17,8 +17,7 @@ final class Property implements PropertyInterface
         private readonly bool $hasDefaultValue,
         private readonly mixed $defaultValue = null,
         private readonly array $collectionValueTypes = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @return non-empty-string

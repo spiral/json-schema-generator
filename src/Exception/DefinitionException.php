@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Exception;
 
-class DefinitionException extends \RuntimeException
-{
-}
+class DefinitionException extends \RuntimeException {}

@@ -18,6 +18,5 @@ class Movie
         public readonly ?string $director = null,
         #[Field(title: 'Release Status', description: 'The release status of the movie')]
         public readonly ?ReleaseStatus $releaseStatus = null,
-    ) {
-    }
+    ) {}
 }

@@ -23,6 +23,7 @@ final class ClassParser implements ClassParserInterface
      * @var array<string, \ReflectionParameter>
      */
     private array $constructorParameters = [];
+
     private readonly PropertyInfoExtractorInterface $propertyInfo;
 
     /**
@@ -90,7 +91,7 @@ final class ClassParser implements ClassParserInterface
                 type: new Type(name: $type->getName(), builtin: $type->isBuiltin(), nullable: $type->allowsNull()),
                 hasDefaultValue: $this->hasPropertyDefaultValue($property),
                 defaultValue: $this->getPropertyDefaultValue($property),
-                collectionValueTypes: $this->getPropertyCollectionTypes($property->getName())
+                collectionValueTypes: $this->getPropertyCollectionTypes($property->getName()),
             );
         }
 
@@ -147,7 +148,7 @@ final class ClassParser implements ClassParserInterface
             $result[] = new Type(
                 name: $name,
                 builtin: $type->getBuiltinType() !== SchemaType::Object->value,
-                nullable: $type->isNullable()
+                nullable: $type->isNullable(),
             );
         }
 

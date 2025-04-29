@@ -23,7 +23,7 @@ final class PropertyOptionsTest extends TestCase
                 '$ref' => '#/definitions/Movie',
             ],
             [
-                'type' => 'integer'
+                'type' => 'integer',
             ],
         ], $options->jsonSerialize());
     }

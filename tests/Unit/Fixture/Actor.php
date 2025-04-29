@@ -19,6 +19,5 @@ final class Actor
         public readonly array $movies = [],
         #[Field(title: 'Best Movie', description: 'The best movie of the actor')]
         public readonly ?Movie $bestMovie = null,
-    ) {
-    }
+    ) {}
 }

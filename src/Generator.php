@@ -19,8 +19,7 @@ class Generator implements GeneratorInterface
 
     public function __construct(
         protected readonly ParserInterface $parser = new Parser(),
-    ) {
-    }
+    ) {}
 
     /**
      * @param class-string|\ReflectionClass $class
@@ -88,7 +87,7 @@ class Generator implements GeneratorInterface
             return new Definition(
                 type: $class->getName(),
                 options: $class->getEnumValues(),
-                title: $class->getShortName()
+                title: $class->getShortName(),
             );
         }
 
@@ -129,8 +128,8 @@ class Generator implements GeneratorInterface
         $options = [];
         if ($property->isCollection()) {
             $options = \array_map(
-                static fn (TypeInterface $type) => $type->getName(),
-                $property->getCollectionValueTypes()
+                static fn(TypeInterface $type) => $type->getName(),
+                $property->getCollectionValueTypes(),
             );
         }
 

@@ -27,7 +27,7 @@ final class SchemaTest extends TestCase
                 title: 'Name',
                 description: 'Name of the user',
                 required: true,
-            )
+            ),
         );
 
         $this->assertEquals(
@@ -43,7 +43,7 @@ final class SchemaTest extends TestCase
                     'name',
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -57,7 +57,7 @@ final class SchemaTest extends TestCase
                 title: 'Name',
                 description: 'Name of the user',
                 required: true,
-            )
+            ),
         );
 
         $schema->addProperty(
@@ -67,7 +67,7 @@ final class SchemaTest extends TestCase
                 title: 'Age',
                 description: 'Age of the user',
                 required: true,
-            )
+            ),
         );
 
         $schema->addProperty(
@@ -77,7 +77,7 @@ final class SchemaTest extends TestCase
                 title: 'Height',
                 description: 'Height of the user',
                 required: true,
-            )
+            ),
         );
 
         $schema->addProperty(
@@ -87,7 +87,7 @@ final class SchemaTest extends TestCase
                 title: 'Is Active',
                 description: 'Is the user active',
                 required: false,
-            )
+            ),
         );
 
         $this->assertEquals(
@@ -120,7 +120,7 @@ final class SchemaTest extends TestCase
                     'height',
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -154,7 +154,7 @@ final class SchemaTest extends TestCase
                     'hobbies',
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -191,7 +191,7 @@ final class SchemaTest extends TestCase
                     'hobbies',
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -226,7 +226,7 @@ final class SchemaTest extends TestCase
                     'hobbies',
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -255,7 +255,7 @@ final class SchemaTest extends TestCase
                     ],
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -284,7 +284,7 @@ final class SchemaTest extends TestCase
                     ],
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -320,7 +320,7 @@ final class SchemaTest extends TestCase
                     ],
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -385,7 +385,7 @@ final class SchemaTest extends TestCase
                     ],
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 }

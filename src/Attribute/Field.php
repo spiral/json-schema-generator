@@ -11,6 +11,5 @@ class Field
         public readonly string $title = '',
         public readonly string $description = '',
         public readonly mixed $default = null,
-    ) {
-    }
+    ) {}
 }

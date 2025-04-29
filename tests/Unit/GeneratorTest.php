@@ -66,7 +66,7 @@ final class GeneratorTest extends TestCase
                     ],
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 
@@ -159,10 +159,10 @@ final class GeneratorTest extends TestCase
                             'Planned',
                             'Canceled',
                         ],
-                    ]
+                    ],
                 ],
             ],
-            $schema->jsonSerialize()
+            $schema->jsonSerialize(),
         );
     }
 }

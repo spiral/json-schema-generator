@@ -54,7 +54,7 @@ final class PropertyTest extends TestCase
     {
         $property = new Property(
             type: Type::Union,
-            options: [Movie::class, Actor::class]
+            options: [Movie::class, Actor::class],
         );
 
         $this->assertEquals([

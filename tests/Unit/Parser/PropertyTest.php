@@ -18,7 +18,7 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'title'),
             $this->createMock(TypeInterface::class),
-            false
+            false,
         );
 
         $this->assertSame('title', $property->getName());
@@ -29,12 +29,12 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'title'),
             $this->createMock(TypeInterface::class),
-            false
+            false,
         );
 
         $this->assertEquals(
             new Field(title: 'Title', description: 'The title of the movie'),
-            $property->findAttribute(Field::class)
+            $property->findAttribute(Field::class),
         );
     }
 
@@ -43,14 +43,14 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             $this->createMock(TypeInterface::class),
-            true
+            true,
         );
         $this->assertTrue($property->hasDefaultValue());
 
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             $this->createMock(TypeInterface::class),
-            false
+            false,
         );
         $this->assertFalse($property->hasDefaultValue());
     }
@@ -60,7 +60,7 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             $this->createMock(TypeInterface::class),
-            true
+            true,
         );
         $this->assertNull($property->getDefaultValue());
 
@@ -68,7 +68,7 @@ final class PropertyTest extends TestCase
             new \ReflectionProperty(Movie::class, 'description'),
             $this->createMock(TypeInterface::class),
             true,
-            'foo'
+            'foo',
         );
         $this->assertSame('foo', $property->getDefaultValue());
     }
@@ -78,21 +78,21 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             new Type('string', true, false),
-            true
+            true,
         );
         $this->assertFalse($property->isCollection());
 
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             new Type(Movie::class, false, false),
-            true
+            true,
         );
         $this->assertFalse($property->isCollection());
 
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             new Type('array', true, false),
-            true
+            true,
         );
         $this->assertTrue($property->isCollection());
     }
@@ -102,7 +102,7 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             $this->createMock(TypeInterface::class),
-            true
+            true,
         );
         $this->assertSame([], $property->getCollectionValueTypes());
 
@@ -111,7 +111,7 @@ final class PropertyTest extends TestCase
             $this->createMock(TypeInterface::class),
             true,
             null,
-            [new Type(Movie::class, false, false)]
+            [new Type(Movie::class, false, false)],
         );
         $this->assertEquals([new Type(Movie::class, false, false)], $property->getCollectionValueTypes());
     }
@@ -121,7 +121,7 @@ final class PropertyTest extends TestCase
         $property = new Property(
             new \ReflectionProperty(Movie::class, 'description'),
             new Type(Movie::class, false, false),
-            true
+            true,
         );
         $this->assertEquals(new Type(Movie::class, false, false), $property->getType());
     }

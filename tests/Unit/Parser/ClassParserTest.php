@@ -14,6 +14,137 @@ use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ReleaseStatus;
 
 final class ClassParserTest extends TestCase
 {
+    public static function collectionsDataProvider(): \Traversable
+    {
+        yield [new class {
+            public array $collection;
+        }, []];
+        yield [
+            new class {
+                /**
+                 * @var array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                 */
+                public array $collection;
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class {
+                /**
+                 * @var array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                 */
+                public array $collection;
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class {
+                /**
+                 * @var \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[]
+                 */
+                public array $collection;
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class {
+                /**
+                 * @var list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                 */
+                public array $collection;
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                public function __construct(
+                    /**
+                     * @var array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                     */
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                public function __construct(
+                    /**
+                     * @var array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                     */
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                public function __construct(
+                    /**
+                     * @var \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[]
+                     */
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                public function __construct(
+                    /**
+                     * @var list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                     */
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                /**
+                 * @param array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
+                 */
+                public function __construct(
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                /**
+                 * @param array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
+                 */
+                public function __construct(
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                /**
+                 * @param \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[] $collection
+                 */
+                public function __construct(
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+        yield [
+            new class([]) {
+                /**
+                 * @param list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
+                 */
+                public function __construct(
+                    public array $collection,
+                ) {}
+            },
+            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)],
+        ];
+    }
+
     public function testGetName(): void
     {
         $parser = new ClassParser(Movie::class);
@@ -94,7 +225,7 @@ final class ClassParserTest extends TestCase
                 'Planned',
                 'Canceled',
             ],
-            $parser->getEnumValues()
+            $parser->getEnumValues(),
         );
     }
 
@@ -110,142 +241,5 @@ final class ClassParserTest extends TestCase
     {
         $parser = new ClassParser($class::class);
         $this->assertEquals($expected, $parser->getProperties()[0]->getCollectionValueTypes());
-    }
-
-    public static function collectionsDataProvider(): \Traversable
-    {
-        yield [new class {public array $collection;}, []];
-        yield [
-            new class {
-                /**
-                 * @var array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
-                 */
-                public array $collection;
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class {
-                /**
-                 * @var array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
-                 */
-                public array $collection;
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class {
-                /**
-                 * @var \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[]
-                 */
-                public array $collection;
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class {
-                /**
-                 * @var list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
-                 */
-                public array $collection;
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                public function __construct(
-                    /**
-                     * @var array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
-                     */
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                public function __construct(
-                    /**
-                     * @var array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
-                     */
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                public function __construct(
-                    /**
-                     * @var \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[]
-                     */
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                public function __construct(
-                    /**
-                     * @var list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
-                     */
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                /**
-                 * @param array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
-                 */
-                public function __construct(
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                /**
-                 * @param array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
-                 */
-                public function __construct(
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                /**
-                 * @param \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[] $collection
-                 */
-                public function __construct(
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
-        yield [
-            new class([]) {
-                /**
-                 * @param list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
-                 */
-                public function __construct(
-                    public array $collection
-                ) {
-                }
-            },
-            [new \Spiral\JsonSchemaGenerator\Parser\Type(Movie::class, false, false)]
-        ];
     }
 }

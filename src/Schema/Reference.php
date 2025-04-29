@@ -14,8 +14,7 @@ final class Reference implements \JsonSerializable
      */
     public function __construct(
         private readonly string $className,
-    ) {
-    }
+    ) {}
 
     public function jsonSerialize(): string
     {

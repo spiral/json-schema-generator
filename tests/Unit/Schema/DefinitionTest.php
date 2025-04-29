@@ -65,8 +65,8 @@ final class DefinitionTest extends TestCase
         $definition = new Definition(
             type: ReleaseStatus::class,
             options: \array_map(
-                static fn (ReleaseStatus $status): string => $status->value,
-                ReleaseStatus::cases()
+                static fn(ReleaseStatus $status): string => $status->value,
+                ReleaseStatus::cases(),
             ),
             title: 'status',
         );
