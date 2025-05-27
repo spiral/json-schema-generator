@@ -21,6 +21,7 @@ final class Property implements \JsonSerializable
         public readonly string $description = '',
         public readonly bool $required = false,
         public readonly mixed $default = null,
+        public readonly ?Format $format = null,
     ) {
         if (\is_string($this->type) && !\class_exists($this->type)) {
             throw new InvalidTypeException('Invalid type definition.');
@@ -43,6 +44,11 @@ final class Property implements \JsonSerializable
         if ($this->default !== null) {
             $property['default'] = $this->default;
         }
+
+        if ($this->format !== null) {
+            $property['format'] = $this->format instanceof Format ? $this->format->value : null;
+        }
+
 
         if ($this->type === Type::Union) {
             $property['anyOf'] = $this->options->jsonSerialize();

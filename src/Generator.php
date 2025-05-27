@@ -111,12 +111,14 @@ class Generator implements GeneratorInterface
         $title = '';
         $description = '';
         $default = null;
+        $format = null;
 
         $attribute = $property->findAttribute(Field::class);
         if ($attribute !== null) {
             $title = $attribute->title;
             $description = $attribute->description;
             $default = $attribute->default;
+            $format = $attribute->format;
         }
 
         if ($default === null && $property->hasDefaultValue()) {
@@ -135,14 +137,14 @@ class Generator implements GeneratorInterface
 
         $required = $default === null && !$type->allowsNull();
         if ($type->isBuiltin()) {
-            return new Property($type->getName(), $options, $title, $description, $required, $default);
+            return new Property($type->getName(), $options, $title, $description, $required, $default, $format);
         }
 
         // Class or enum
         $class = $type->getName();
 
         return \is_string($class) && \class_exists($class)
-            ? new Property($class, [], $title, $description, $required, $default)
+            ? new Property($class, [], $title, $description, $required, $default, $format)
             : null;
     }
 }
