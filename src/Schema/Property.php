@@ -45,8 +45,8 @@ final class Property implements \JsonSerializable
             $property['default'] = $this->default;
         }
 
-        if ($this->format !== null) {
-            $property['format'] = $this->format instanceof Format ? $this->format->value : null;
+        if ($this->format instanceof Format) {
+            $property['format'] = $this->format->value;
         }
 
 
