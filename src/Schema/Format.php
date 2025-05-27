@@ -9,6 +9,11 @@ namespace Spiral\JsonSchemaGenerator\Schema;
  */
 enum Format: string
 {
+    case Date = 'date';
+    case Time = 'time';
+    case DateTime = 'date-time';
+    case Duration = 'duration';
+    case Regex = 'regex';
     case Email = 'email';
     case IdnEmail = 'idn-email';
     case Hostname = 'hostname';
