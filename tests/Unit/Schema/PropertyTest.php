@@ -159,5 +159,4 @@ final class PropertyTest extends TestCase
             'format' => 'uri',
         ], $property->jsonSerialize());
     }
-
 }
