@@ -46,6 +46,12 @@ final class GeneratorTest extends TestCase
                             ],
                         ],
                     ],
+                    'releaseDate'      => [
+                        'type' => 'string',
+                        'format' => 'date',
+                        'title' => 'Release date',
+                        'description' => 'The release date of the movie',
+                    ],
                 ],
                 'required'    => [
                     'title',
@@ -141,6 +147,12 @@ final class GeneratorTest extends TestCase
                                         '$ref' => '#/definitions/ReleaseStatus',
                                     ],
                                 ],
+                            ],
+                            'releaseDate'      => [
+                                'type' => 'string',
+                                'format' => 'date',
+                                'title' => 'Release date',
+                                'description' => 'The release date of the movie',
                             ],
                         ],
                         'required'   => [

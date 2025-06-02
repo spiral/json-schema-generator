@@ -6,6 +6,7 @@ namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
+use Spiral\JsonSchemaGenerator\Schema\Format;
 use Spiral\JsonSchemaGenerator\Schema\Property;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Actor;
@@ -147,4 +148,16 @@ final class PropertyTest extends TestCase
         $this->expectException(InvalidTypeException::class);
         new Property(type: 'foo');
     }
+
+    public function testPropertyWithFormat(): void
+    {
+        $property = new Property(type: Type::String, title: 'Homepage', format: Format::Uri);
+
+        $this->assertEquals([
+            'type' => 'string',
+            'title' => 'Homepage',
+            'format' => 'uri',
+        ], $property->jsonSerialize());
+    }
+
 }
