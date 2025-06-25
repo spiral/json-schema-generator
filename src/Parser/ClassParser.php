@@ -138,9 +138,6 @@ final class ClassParser implements ClassParserInterface
 
         $result = [];
         foreach ($collectionTypes as $type) {
-            /**
-             * @var non-empty-string $name
-             */
             if ($type instanceof ObjectType) {
                 $name = $type->getClassName();
                 $builtin = false;
