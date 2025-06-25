@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Spiral\JsonSchemaGenerator\Parser;
 
 use Spiral\JsonSchemaGenerator\Exception\GeneratorException;
-use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
 
 /**
  * @internal
@@ -127,13 +129,11 @@ final class ClassParser implements ClassParserInterface
      */
     private function getPropertyCollectionTypes(string $property): array
     {
-        $types = $this->propertyInfo->getTypes($this->class->getName(), $property);
+        $type = $this->propertyInfo->getType($this->class->getName(), $property);
 
         $collectionTypes = [];
-        foreach ($types ?? [] as $type) {
-            if ($type->isCollection()) {
-                $collectionTypes = [...$type->getCollectionValueTypes(), ...$collectionTypes];
-            }
+        if ($type !== null && $type instanceof CollectionType) {
+            $collectionTypes = [$type->getCollectionValueType()];
         }
 
         $result = [];
@@ -141,13 +141,24 @@ final class ClassParser implements ClassParserInterface
             /**
              * @var non-empty-string $name
              */
-            $name = $type->getBuiltinType() === SchemaType::Object->value
-                ? $type->getClassName()
-                : $type->getBuiltinType();
+            if ($type instanceof ObjectType) {
+                $name = $type->getClassName();
+                $builtin = false;
+            } elseif ($type instanceof BuiltinType) {
+                $name = $type->getTypeIdentifier()->value;
+                // Skip mixed type as it's not supported
+                if ($name === 'mixed') {
+                    continue;
+                }
+                $builtin = true;
+            } else {
+                // Handle other types if needed
+                continue;
+            }
 
             $result[] = new Type(
                 name: $name,
-                builtin: $type->getBuiltinType() !== SchemaType::Object->value,
+                builtin: $builtin,
                 nullable: $type->isNullable(),
             );
         }
