@@ -247,11 +247,7 @@ final class SchemaTest extends TestCase
                 'properties' => [
                     'movie' => [
                         'title' => 'Some movie',
-                        'allOf' => [
-                            [
-                                '$ref' => '#/definitions/Movie',
-                            ],
-                        ],
+                        '$ref' => '#/definitions/Movie',
                     ],
                 ],
             ],

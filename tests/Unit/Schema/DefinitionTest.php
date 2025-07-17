@@ -27,10 +27,12 @@ final class DefinitionTest extends TestCase
                     required: true,
                 ),
                 'status' => new Property(
-                    type: ReleaseStatus::class,
+                    type: Type::String,
                     title: 'Status',
                     description: 'Status of the movie',
                     required: true,
+                    allowsNull: true,
+                    enum: ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                 ),
             ],
         );
@@ -39,18 +41,15 @@ final class DefinitionTest extends TestCase
             'type' => 'object',
             'properties' => [
                 'title' => [
-                    'title' => 'Title',
+                    'title'       => 'Title',
                     'description' => 'Title of the movie',
-                    'type' => 'string',
+                    'type'        => 'string',
                 ],
                 'status' => [
-                    'title' => 'Status',
+                    'title'       => 'Status',
                     'description' => 'Status of the movie',
-                    'allOf' => [
-                        [
-                            '$ref' => '#/definitions/ReleaseStatus',
-                        ],
-                    ],
+                    'type'        => ['string', 'null'],
+                    'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                 ],
             ],
             'required' => [

@@ -16,4 +16,8 @@ interface TypeInterface
     public function isBuiltin(): bool;
 
     public function allowsNull(): bool;
+
+    public function isEnum(): bool;
+
+    public function getEnumValues(): ?array;
 }

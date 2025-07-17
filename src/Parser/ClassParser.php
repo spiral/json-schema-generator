@@ -88,7 +88,12 @@ final class ClassParser implements ClassParserInterface
 
             $properties[] = new Property(
                 property: $property,
-                type: new Type(name: $type->getName(), builtin: $type->isBuiltin(), nullable: $type->allowsNull()),
+                type: new Type(
+                    name: $this->getTypeName($type),
+                    builtin: $this->getTypeBuildIn($type),
+                    nullable: $type->allowsNull(),
+                    enum: $this->getEnumValues($type),
+                ),
                 hasDefaultValue: $this->hasPropertyDefaultValue($property),
                 defaultValue: $this->getPropertyDefaultValue($property),
                 collectionValueTypes: $this->getPropertyCollectionTypes($property->getName()),
@@ -103,21 +108,47 @@ final class ClassParser implements ClassParserInterface
         return $this->class->isEnum();
     }
 
-    public function getEnumValues(): array
+    private function getEnumValues(\ReflectionNamedType $type): ?array
     {
-        if (!$this->isEnum()) {
-            throw new GeneratorException(\sprintf('Class `%s` is not an enum.', $this->class->getName()));
+        if (!\is_subclass_of($type->getName(), \BackedEnum::class)) {
+            return null;
         }
 
-        $values = [];
-        foreach ($this->class->getReflectionConstants() as $constant) {
-            $value = $constant->getValue();
-            \assert($value instanceof \BackedEnum);
+        $reflectionEnum = new \ReflectionEnum($type->getName());
 
-            $values[] = $value->value;
+        return \array_map(
+            static fn(\ReflectionEnumUnitCase $case): int|string => $case->getValue()->value,
+            $reflectionEnum->getCases(),
+        );
+    }
+
+    private function getTypeBuildIn(\ReflectionNamedType $type): bool
+    {
+        if ($type->isBuiltin() || \is_subclass_of($type->getName(), \BackedEnum::class)) {
+            return true;
         }
 
-        return $values;
+        return false;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getTypeName(\ReflectionNamedType $type): string
+    {
+        $typeName = $type->getName();
+        if ($type->isBuiltin() || !\is_subclass_of($typeName, \BackedEnum::class)) {
+            return $typeName;
+        }
+
+        $reflection = new \ReflectionEnum($typeName);
+        $backingType = $reflection->getBackingType();
+
+        if (!$backingType instanceof \ReflectionNamedType) {
+            return $typeName;
+        }
+
+        return $backingType->getName();
     }
 
     /**

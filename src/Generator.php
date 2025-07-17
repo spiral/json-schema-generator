@@ -83,14 +83,6 @@ class Generator implements GeneratorInterface
     protected function generateDefinition(ClassParserInterface $class, array &$dependencies = []): ?Definition
     {
         $properties = [];
-        if ($class->isEnum()) {
-            return new Definition(
-                type: $class->getName(),
-                options: $class->getEnumValues(),
-                title: $class->getShortName(),
-            );
-        }
-
         // class properties
         foreach ($class->getProperties() as $property) {
             $psc = $this->generateProperty($property);
@@ -137,14 +129,33 @@ class Generator implements GeneratorInterface
 
         $required = $default === null && !$type->allowsNull();
         if ($type->isBuiltin()) {
-            return new Property($type->getName(), $options, $title, $description, $required, $default, $format);
+            return new Property(
+                type: $type->getName(),
+                options: $options,
+                title: $title,
+                description: $description,
+                required: $required,
+                allowsNull: $type->allowsNull(),
+                default: $default,
+                enum: $type->getEnumValues(),
+                format: $format,
+            );
         }
 
-        // Class or enum
+        // Class
         $class = $type->getName();
 
         return \is_string($class) && \class_exists($class)
-            ? new Property($class, [], $title, $description, $required, $default, $format)
+            ? new Property(
+                type: $class,
+                options: [],
+                title: $title,
+                description: $description,
+                required: $required,
+                allowsNull: $type->allowsNull(),
+                default: $default,
+                format: $format,
+            )
             : null;
     }
 }

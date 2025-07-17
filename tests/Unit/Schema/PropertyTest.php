@@ -77,11 +77,7 @@ final class PropertyTest extends TestCase
         );
 
         $this->assertEquals([
-            'allOf' => [
-                [
-                    '$ref' => '#/definitions/Movie',
-                ],
-            ],
+            '$ref' =>  '#/definitions/Movie',
         ], $property->jsonSerialize());
     }
 

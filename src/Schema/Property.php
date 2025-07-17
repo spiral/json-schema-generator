@@ -20,7 +20,9 @@ final class Property implements \JsonSerializable
         public readonly string $title = '',
         public readonly string $description = '',
         public readonly bool $required = false,
+        public readonly bool $allowsNull = false,
         public readonly mixed $default = null,
+        public ?array $enum = null,
         public readonly ?Format $format = null,
     ) {
         if (\is_string($this->type) && !\class_exists($this->type)) {
@@ -57,11 +59,21 @@ final class Property implements \JsonSerializable
 
         if (\is_string($this->type)) {
             // this is nested class
-            $property['allOf'][] = ['$ref' => (new Reference($this->type))->jsonSerialize()];
+            if ($this->allowsNull) {
+                $property['oneOf'][] = ['$ref' => (new Reference($this->type))->jsonSerialize()];
+                $property['oneOf'][] = ['type' => Type::Null->value];
+                return $property;
+            }
+            $property['$ref'] = (new Reference($this->type))->jsonSerialize();
+
             return $property;
         }
 
-        $property['type'] = $this->type->value;
+        $property['type'] = $this->allowsNull ? [$this->type->value, Type::Null->value] : $this->type->value;
+
+        if ($this->enum !== null) {
+            $property['enum'] = $this->enum;
+        }
 
         if ($this->type === Type::Array) {
             if (\count($this->options) === 1) {

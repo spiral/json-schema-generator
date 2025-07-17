@@ -32,22 +32,19 @@ final class GeneratorTest extends TestCase
                     'description'   => [
                         'title'       => 'Description',
                         'description' => 'The description of the movie',
-                        'type'        => 'string',
+                        'type'        => ['string', 'null'],
                     ],
                     'director'      => [
-                        'type' => 'string',
+                        'type' => ['string', 'null'],
                     ],
                     'releaseStatus' => [
                         'title'       => 'Release Status',
                         'description' => 'The release status of the movie',
-                        'allOf'       => [
-                            [
-                                '$ref' => '#/definitions/ReleaseStatus',
-                            ],
-                        ],
+                        'type'        => ['string', 'null'],
+                        'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                     ],
                     'releaseDate'      => [
-                        'type' => 'string',
+                        'type' => ['string', 'null'],
                         'format' => 'date',
                         'title' => 'Release date',
                         'description' => 'The release date of the movie',
@@ -56,20 +53,6 @@ final class GeneratorTest extends TestCase
                 'required'    => [
                     'title',
                     'year',
-                ],
-                'definitions' => [
-                    'ReleaseStatus' => [
-                        'title' => 'ReleaseStatus',
-                        'type'  => 'string',
-                        'enum'  => [
-                            'Released',
-                            'Rumored',
-                            'Post Production',
-                            'In Production',
-                            'Planned',
-                            'Canceled',
-                        ],
-                    ],
                 ],
             ],
             $schema->jsonSerialize(),
@@ -93,7 +76,7 @@ final class GeneratorTest extends TestCase
                     'bio'       => [
                         'title'       => 'Biography',
                         'description' => 'The biography of the actor',
-                        'type'        => 'string',
+                        'type'        => ['string', 'null'],
                     ],
                     'movies'    => [
                         'type'  => 'array',
@@ -105,9 +88,12 @@ final class GeneratorTest extends TestCase
                     'bestMovie' => [
                         'title'       => 'Best Movie',
                         'description' => 'The best movie of the actor',
-                        'allOf'       => [
+                        'oneOf'       => [
                             [
                                 '$ref' => '#/definitions/Movie',
+                            ],
+                            [
+                                'type' => 'null',
                             ],
                         ],
                     ],
@@ -134,42 +120,27 @@ final class GeneratorTest extends TestCase
                             'description'   => [
                                 'title'       => 'Description',
                                 'description' => 'The description of the movie',
-                                'type'        => 'string',
+                                'type'        => ['string', 'null'],
                             ],
                             'director'      => [
-                                'type' => 'string',
-                            ],
-                            'releaseStatus' => [
-                                'title'       => 'Release Status',
-                                'description' => 'The release status of the movie',
-                                'allOf'       => [
-                                    [
-                                        '$ref' => '#/definitions/ReleaseStatus',
-                                    ],
-                                ],
+                                'type' => ['string', 'null'],
                             ],
                             'releaseDate'      => [
-                                'type' => 'string',
+                                'type' => ['string', 'null'],
                                 'format' => 'date',
                                 'title' => 'Release date',
                                 'description' => 'The release date of the movie',
+                            ],
+                            'releaseStatus'    => [
+                                'title' => 'Release Status',
+                                'description' => 'The release status of the movie',
+                                'type' => ['string', 'null'],
+                                'enum' => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                             ],
                         ],
                         'required'   => [
                             'title',
                             'year',
-                        ],
-                    ],
-                    'ReleaseStatus' => [
-                        'title' => 'ReleaseStatus',
-                        'type'  => 'string',
-                        'enum'  => [
-                            'Released',
-                            'Rumored',
-                            'Post Production',
-                            'In Production',
-                            'Planned',
-                            'Canceled',
                         ],
                     ],
                 ],

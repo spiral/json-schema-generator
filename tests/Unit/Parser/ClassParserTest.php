@@ -6,7 +6,6 @@ namespace Spiral\JsonSchemaGenerator\Tests\Unit\Parser;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Spiral\JsonSchemaGenerator\Exception\GeneratorException;
 use Spiral\JsonSchemaGenerator\Parser\ClassParser;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
@@ -196,8 +195,13 @@ final class ClassParserTest extends TestCase
         $this->assertNull($properties[3]->getDefaultValue());
 
         $this->assertSame('releaseStatus', $properties[4]->getName());
-        $this->assertSame(ReleaseStatus::class, $properties[4]->getType()->getName());
-        $this->assertFalse($properties[4]->getType()->isBuiltin());
+        $this->assertSame(Type::String, $properties[4]->getType()->getName());
+        $this->assertTrue($properties[4]->getType()->isEnum());
+        $this->assertEquals(
+            ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
+            $properties[4]->getType()->getEnumValues(),
+        );
+        $this->assertTrue($properties[4]->getType()->isBuiltin());
         $this->assertTrue($properties[4]->getType()->allowsNull());
         $this->assertFalse($properties[4]->isCollection());
         $this->assertTrue($properties[4]->hasDefaultValue());
@@ -211,29 +215,6 @@ final class ClassParserTest extends TestCase
 
         $parser = new ClassParser(ReleaseStatus::class);
         $this->assertTrue($parser->isEnum());
-    }
-
-    public function testGetEnumValues(): void
-    {
-        $parser = new ClassParser(ReleaseStatus::class);
-        $this->assertSame(
-            [
-                'Released',
-                'Rumored',
-                'Post Production',
-                'In Production',
-                'Planned',
-                'Canceled',
-            ],
-            $parser->getEnumValues(),
-        );
-    }
-
-    public function testGetEnumValuesException(): void
-    {
-        $parser = new ClassParser(Movie::class);
-        $this->expectException(GeneratorException::class);
-        $parser->getEnumValues();
     }
 
     #[DataProvider('collectionsDataProvider')]

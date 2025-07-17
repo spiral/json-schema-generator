@@ -7,7 +7,7 @@
 [![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 
-The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/) from Data Transfer Object (DTO) classes. 
+The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/) from Data Transfer Object (DTO) classes.
 It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title, description, and default value.
 
 Main use case - structured output definition for LLMs.
@@ -107,38 +107,21 @@ Example array output:
         'description'   => [
             'title'       => 'Description',
             'description' => 'The description of the movie',
-            'type'        => 'string',
+            'type'        => ['string', 'null'],
         ],
         'director'      => [
-            'type' => 'string',
+            'type' => ['string', 'null'],
         ],
         'releaseStatus' => [
             'title'       => 'Release Status',
             'description' => 'The release status of the movie',
-            'allOf'       => [
-                [
-                    '$ref' => '#/definitions/ReleaseStatus',
-                ],
-            ],
+            'type'        => ['string', 'null']
+            'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
         ],
     ],
     'required'    => [
         'title',
         'year',
-    ],
-    'definitions' => [
-        'ReleaseStatus' => [
-            'title' => 'ReleaseStatus',
-            'type'  => 'string',
-            'enum'  => [
-                'Released',
-                'Rumored',
-                'Post Production',
-                'In Production',
-                'Planned',
-                'Canceled',
-            ],
-        ],
     ],
 ];
 ```
@@ -160,6 +143,7 @@ final class Actor
          * @var array<Movie>
          */
         public readonly array $movies = [],
+        public readonly ?Movie $bestMovie = null;
     ) {
     }
 }
@@ -197,6 +181,18 @@ Example array output:
             ],
             'default' => [],
         ],
+        'bestMovie' => [
+            'title'       => 'Best Movie',
+            'description' => 'The best movie of the actor',
+            'oneOf'       => [
+                [
+                    '$ref' => '#/definitions/Movie',
+                ],
+                [
+                    'type' => 'null',
+                ],
+            ],
+        ],
     ],
     'required'   => [
         'name',
@@ -219,19 +215,16 @@ Example array output:
                 'description'   => [
                     'title'       => 'Description',
                     'description' => 'The description of the movie',
-                    'type'        => 'string',
+                    'type'        => ['string', 'null'],
                 ],
                 'director'      => [
-                    'type' => 'string',
+                    'type' => ['string', 'null'],
                 ],
                 'releaseStatus' => [
                     'title'       => 'Release Status',
                     'description' => 'The release status of the movie',
-                    'allOf'       => [
-                        [
-                            '$ref' => '#/definitions/ReleaseStatus',
-                        ],
-                    ],
+                    'type'        => ['string', 'null']
+                    'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                 ],
             ],
             'required'   => [
@@ -239,18 +232,6 @@ Example array output:
                 'year',
             ],
         ],
-        'ReleaseStatus' => [
-            'title' => 'ReleaseStatus',
-            'type'  => 'string',
-            'enum'  => [
-                'Released',
-                'Rumored',
-                'Post Production',
-                'In Production',
-                'Planned',
-                'Canceled',
-            ],
-       ]
     ],
 ];
 ```

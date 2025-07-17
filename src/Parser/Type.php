@@ -23,6 +23,7 @@ final class Type implements TypeInterface
         string $name,
         private readonly bool $builtin,
         private readonly bool $nullable,
+        private readonly ?array $enum = null,
     ) {
         /** @psalm-suppress PropertyTypeCoercion */
         $this->name = $this->builtin ? SchemaType::fromBuiltIn($name) : $name;
@@ -44,5 +45,15 @@ final class Type implements TypeInterface
     public function allowsNull(): bool
     {
         return $this->nullable;
+    }
+
+    public function isEnum(): bool
+    {
+        return $this->enum !== null;
+    }
+
+    public function getEnumValues(): ?array
+    {
+        return $this->enum;
     }
 }
