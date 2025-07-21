@@ -14,7 +14,6 @@ enum Type: string
     case Array = 'array';
     case Null = 'null';
     case Union = 'union';
-    case Enum = 'enum';
 
     public static function fromBuiltIn(string $type): self
     {

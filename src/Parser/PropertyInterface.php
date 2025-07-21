@@ -24,12 +24,5 @@ interface PropertyInterface
 
     public function getDefaultValue(): mixed;
 
-    public function isCollection(): bool;
-
-    /**
-     * @return array<TypeInterface>
-     */
-    public function getCollectionValueTypes(): array;
-
-    public function getType(): TypeInterface;
+    public function getType(): Type;
 }

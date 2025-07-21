@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Parser;
 
-use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
-
 /**
  * @internal
  */
@@ -13,10 +11,9 @@ final class Property implements PropertyInterface
 {
     public function __construct(
         private readonly \ReflectionProperty $property,
-        private readonly TypeInterface $type,
+        private readonly Type $type,
         private readonly bool $hasDefaultValue,
         private readonly mixed $defaultValue = null,
-        private readonly array $collectionValueTypes = [],
     ) {}
 
     /**
@@ -54,25 +51,7 @@ final class Property implements PropertyInterface
         return $this->defaultValue;
     }
 
-    public function isCollection(): bool
-    {
-        $type = $this->type->getName();
-        if (!$type instanceof SchemaType) {
-            return false;
-        }
-
-        return $type->value === SchemaType::Array->value;
-    }
-
-    /**
-     * @return array<TypeInterface>
-     */
-    public function getCollectionValueTypes(): array
-    {
-        return $this->collectionValueTypes;
-    }
-
-    public function getType(): TypeInterface
+    public function getType(): Type
     {
         return $this->type;
     }

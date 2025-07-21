@@ -20,8 +20,4 @@ interface ClassParserInterface
      * @return array<PropertyInterface>
      */
     public function getProperties(): array;
-
-    public function isEnum(): bool;
-
-    public function getEnumValues(): array;
 }

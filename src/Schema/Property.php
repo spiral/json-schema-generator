@@ -4,31 +4,19 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Schema;
 
-use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
-
 final class Property implements \JsonSerializable
 {
-    public readonly PropertyOptions $options;
-
     /**
-     * @param Type|class-string $type
-     * @param array<class-string|Type> $options
+     * @param list<PropertyType> $types
      */
     public function __construct(
-        public readonly Type|string $type,
-        array $options = [],
+        public readonly array $types,
         public readonly string $title = '',
         public readonly string $description = '',
         public readonly bool $required = false,
         public readonly mixed $default = null,
         public readonly ?Format $format = null,
-    ) {
-        if (\is_string($this->type) && !\class_exists($this->type)) {
-            throw new InvalidTypeException('Invalid type definition.');
-        }
-
-        $this->options = new PropertyOptions($options);
-    }
+    ) {}
 
     public function jsonSerialize(): array
     {
@@ -49,32 +37,13 @@ final class Property implements \JsonSerializable
             $property['format'] = $this->format->value;
         }
 
-
-        if ($this->type === Type::Union) {
-            $property['anyOf'] = $this->options->jsonSerialize();
-            return $property;
-        }
-
-        if (\is_string($this->type)) {
-            // this is nested class
-            $property['allOf'][] = ['$ref' => (new Reference($this->type))->jsonSerialize()];
-            return $property;
-        }
-
-        $property['type'] = $this->type->value;
-
-        if ($this->type === Type::Array) {
-            if (\count($this->options) === 1) {
-                if (\is_string($this->options[0]->value)) {
-                    // reference to class
-                    $property['items']['$ref'] = (new Reference($this->options[0]->value))->jsonSerialize();
-                    return $property;
-                }
-
-                $property['items']['type'] = $this->options[0]->value->value;
-            } else {
-                $property['items']['anyOf'] = $this->options->jsonSerialize();
+        $typesCount = \count($this->types);
+        if ($typesCount > 1) {
+            foreach ($this->types as $type) {
+                $property['oneOf'][] = $this->propertyTypeToDefinition($type);
             }
+        } elseif ($typesCount === 1) {
+            $property = \array_merge($property, $this->propertyTypeToDefinition($this->types[0]));
         }
 
         return $property;
@@ -83,16 +52,61 @@ final class Property implements \JsonSerializable
     public function getDependencies(): array
     {
         $dependencies = [];
-        foreach ($this->options->getOptions() as $option) {
-            if (\is_string($option->value)) {
-                $dependencies[] = $option->value;
+        foreach ($this->types as $type) {
+            if (\is_string($type->type)) {
+                $dependencies[] = $type->type;
+            }
+            if ($type->type === Type::Array && $type->collectionTypes !== null && $type->collectionTypes !== []) {
+                foreach ($type->collectionTypes as $collectionType) {
+                    if (\is_string($collectionType->type)) {
+                        $dependencies[] = $collectionType->type;
+                    }
+                }
             }
         }
 
-        if (\is_string($this->type)) {
-            $dependencies[] = $this->type;
+        return $dependencies;
+    }
+
+    protected function propertyTypeToDefinition(PropertyType $propertyType): array
+    {
+        $property = [];
+
+        if ($propertyType->type instanceof Type) {
+            $property['type'] = $propertyType->type->value;
+            if ($propertyType->enum !== null) {
+                $property['enum'] = $propertyType->enum;
+            }
+            if ($propertyType->type === Type::Array && $propertyType->collectionTypes !== null && $propertyType->collectionTypes !== []) {
+                $collectionTypeCount = \count($propertyType->collectionTypes);
+                if ($collectionTypeCount > 1) {
+                    foreach ($propertyType->collectionTypes as $collectionType) {
+                        if ($collectionType->type instanceof Type) {
+                            $schemaType = ['type' => $collectionType->type->value];
+                            if ($collectionType->enum !== null) {
+                                $schemaType['enum'] = $collectionType->enum;
+                            }
+                            $property['items']['anyOf'][] = $schemaType;
+                        } else {
+                            $property['items']['anyOf'][] = ['$ref' => (new Reference($collectionType->type))->jsonSerialize()];
+                        }
+                    }
+                } elseif ($collectionTypeCount === 1) {
+                    $collectionType = $propertyType->collectionTypes[0];
+                    if ($collectionType->type instanceof Type) {
+                        $property['items'] = ['type' => $collectionType->type->value];
+                        if ($collectionType->enum !== null) {
+                            $property['items']['enum'] = $collectionType->enum;
+                        }
+                    } else {
+                        $property['items'] = ['$ref' => (new Reference($collectionType->type))->jsonSerialize()];
+                    }
+                }
+            }
+        } else {
+            $property['$ref'] = (new Reference($propertyType->type))->jsonSerialize();
         }
 
-        return $dependencies;
+        return $property;
     }
 }
