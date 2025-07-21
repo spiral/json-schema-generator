@@ -9,9 +9,11 @@ use Spiral\JsonSchemaGenerator\Parser\ClassParserInterface;
 use Spiral\JsonSchemaGenerator\Parser\Parser;
 use Spiral\JsonSchemaGenerator\Parser\ParserInterface;
 use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
-use Spiral\JsonSchemaGenerator\Parser\TypeInterface;
+use Spiral\JsonSchemaGenerator\Parser\SimpleType;
+use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
+use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 
 class Generator implements GeneratorInterface
 {
@@ -119,43 +121,28 @@ class Generator implements GeneratorInterface
 
         $type = $property->getType();
 
-        $options = [];
-        if ($property->isCollection()) {
-            $options = \array_map(
-                static fn(TypeInterface $type) => $type->getName(),
-                $property->getCollectionValueTypes(),
-            );
-        }
+        return new Property(
+            types: $this->extractPropertyTypes($type),
+            title: $title,
+            description: $description,
+            required: $default === null && !$type->allowsNull(),
+            default: $default,
+            format: $format,
+        );
+    }
 
-        $required = $default === null && !$type->allowsNull();
-        if ($type->isBuiltin()) {
-            return new Property(
-                type: $type->getName(),
-                options: $options,
-                title: $title,
-                description: $description,
-                required: $required,
-                allowsNull: $type->allowsNull(),
-                default: $default,
-                enum: $type->getEnumValues(),
-                format: $format,
-            );
-        }
-
-        // Class
-        $class = $type->getName();
-
-        return \is_string($class) && \class_exists($class)
-            ? new Property(
-                type: $class,
-                options: [],
-                title: $title,
-                description: $description,
-                required: $required,
-                allowsNull: $type->allowsNull(),
-                default: $default,
-                format: $format,
-            )
-            : null;
+    /**
+     * @return list<PropertyType>
+     */
+    private function extractPropertyTypes(Type $type): array
+    {
+        return \array_map(static fn(SimpleType $simpleType) => new PropertyType(
+            type: $simpleType->getName(),
+            enum: $simpleType->getEnumValues(),
+            collectionTypes: $simpleType->isCollection() ? \array_map(static fn(SimpleType $collectionSimpleType) => new PropertyType(
+                type: $collectionSimpleType->getName(),
+                enum: $collectionSimpleType->getEnumValues(),
+            ), $simpleType->getCollectionType()?->types ?? []) : null,
+        ), $type->types);
     }
 }

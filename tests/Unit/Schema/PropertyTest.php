@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
-use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
+use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Schema\Format;
 use Spiral\JsonSchemaGenerator\Schema\Property;
+use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Actor;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
@@ -16,14 +17,14 @@ final class PropertyTest extends TestCase
 {
     public function testPropertyOnlyRequiredParams(): void
     {
-        $property = new Property(type: Type::String);
+        $property = new Property(types: [new PropertyType(type: Type::String)]);
 
         $this->assertEquals(['type' => 'string'], $property->jsonSerialize());
     }
 
     public function testPropertyWithTitle(): void
     {
-        $property = new Property(type: Type::String, title: 'Some movie');
+        $property = new Property(types: [new PropertyType(type: Type::String)], title: 'Some movie');
 
         $this->assertEquals([
             'type' => 'string',
@@ -33,7 +34,7 @@ final class PropertyTest extends TestCase
 
     public function testPropertyWithDescription(): void
     {
-        $property = new Property(type: Type::String, description: 'Some description');
+        $property = new Property(types: [new PropertyType(type: Type::String)], description: 'Some description');
 
         $this->assertEquals([
             'type' => 'string',
@@ -43,7 +44,7 @@ final class PropertyTest extends TestCase
 
     public function testPropertyWithDefault(): void
     {
-        $property = new Property(type: Type::String, default: 'value');
+        $property = new Property(types: [new PropertyType(type: Type::String)], default: 'value');
 
         $this->assertEquals([
             'type' => 'string',
@@ -54,12 +55,11 @@ final class PropertyTest extends TestCase
     public function testPropertyWithUnionType(): void
     {
         $property = new Property(
-            type: Type::Union,
-            options: [Movie::class, Actor::class],
+            types: [new PropertyType(type: Movie::class), new PropertyType(type: Actor::class)],
         );
 
         $this->assertEquals([
-            'anyOf' => [
+            'oneOf' => [
                 [
                     '$ref' => '#/definitions/Movie',
                 ],
@@ -73,7 +73,7 @@ final class PropertyTest extends TestCase
     public function testPropertyWithClassType(): void
     {
         $property = new Property(
-            type: Movie::class,
+            types: [new PropertyType(type: Movie::class)],
         );
 
         $this->assertEquals([
@@ -84,8 +84,7 @@ final class PropertyTest extends TestCase
     public function testPropertyWithArrayTypeSingleClassElem(): void
     {
         $property = new Property(
-            type: Type::Array,
-            options: [Movie::class],
+            types: [new PropertyType(type: Type::Array, collectionTypes: [new PropertyType(type: Movie::class)])],
             title: 'Some movie',
         );
 
@@ -101,8 +100,7 @@ final class PropertyTest extends TestCase
     public function testPropertyWithArrayTypeSingleScalarElem(): void
     {
         $property = new Property(
-            type: Type::Array,
-            options: [Type::String],
+            types: [new PropertyType(type: Type::Array, collectionTypes: [new PropertyType(type: Type::String)])],
             title: 'Some movie',
         );
 
@@ -118,8 +116,7 @@ final class PropertyTest extends TestCase
     public function testPropertyWithArrayTypeMultipleElems(): void
     {
         $property = new Property(
-            type: Type::Array,
-            options: [Movie::class, Type::String],
+            types: [new PropertyType(type: Type::Array, collectionTypes: [new PropertyType(type: Movie::class), new PropertyType(type: Type::String)])],
             title: 'Some movie',
         );
 
@@ -141,13 +138,13 @@ final class PropertyTest extends TestCase
 
     public function testInvalidTypeException(): void
     {
-        $this->expectException(InvalidTypeException::class);
-        new Property(type: 'foo');
+        $this->expectException(\InvalidArgumentException::class);
+        new SimpleType(name: 'foo', builtin: true);
     }
 
     public function testPropertyWithFormat(): void
     {
-        $property = new Property(type: Type::String, title: 'Homepage', format: Format::Uri);
+        $property = new Property(types: [new PropertyType(type: Type::String)], title: 'Homepage', format: Format::Uri);
 
         $this->assertEquals([
             'type' => 'string',

@@ -107,16 +107,36 @@ Example array output:
         'description'   => [
             'title'       => 'Description',
             'description' => 'The description of the movie',
-            'type'        => ['string', 'null'],
+            'oneOf'       => [
+                ['type' => 'null'],
+                ['type' => 'string'],
+            ],
         ],
-        'director'      => [
-            'type' => ['string', 'null'],
+        'director' => [
+            'oneOf' => [
+                ['type' => 'null'],
+                ['type' => 'string'],
+            ],
         ],
         'releaseStatus' => [
             'title'       => 'Release Status',
             'description' => 'The release status of the movie',
-            'type'        => ['string', 'null']
-            'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
+            'oneOf'       => [
+                [
+                    'type' => 'null',
+                ],
+                [
+                    'type' => 'string',
+                    'enum' => [
+                        'Released',
+                        'Rumored',
+                        'Post Production',
+                        'In Production',
+                        'Planned',
+                        'Canceled',
+                    ],
+                ],
+            ],
         ],
     ],
     'required'    => [
@@ -142,7 +162,7 @@ final class Actor
         /**
          * @var array<Movie>
          */
-        public readonly array $movies = [],
+        public readonly ?array $movies = null,
         public readonly ?Movie $bestMovie = null;
     ) {
     }
@@ -175,21 +195,27 @@ Example array output:
             'type' => 'string',
         ],
         'movies' => [
-            'type'  => 'array',
-            'items' => [
-                '$ref' => '#/definitions/Movie',
+            'oneOf' => [
+                [
+                    'type' => 'null',
+                ],
+                [
+                    'type'  => 'array',
+                    'items' => [
+                        '$ref' => '#/definitions/Movie',
+                    ],
+                ],
             ],
-            'default' => [],
         ],
         'bestMovie' => [
             'title'       => 'Best Movie',
             'description' => 'The best movie of the actor',
             'oneOf'       => [
                 [
-                    '$ref' => '#/definitions/Movie',
+                    'type' => 'null',
                 ],
                 [
-                    'type' => 'null',
+                    '$ref' => '#/definitions/Movie',
                 ],
             ],
         ],
@@ -215,15 +241,24 @@ Example array output:
                 'description'   => [
                     'title'       => 'Description',
                     'description' => 'The description of the movie',
-                    'type'        => ['string', 'null'],
+                    'oneOf'       => [
+                        ['type' => 'null'],
+                        ['type' => 'string'],
+                    ],
                 ],
                 'director'      => [
-                    'type' => ['string', 'null'],
+                    'oneOf' => [
+                        ['type' => 'null'],
+                        ['type' => 'string'],
+                    ],
                 ],
                 'releaseStatus' => [
                     'title'       => 'Release Status',
                     'description' => 'The release status of the movie',
-                    'type'        => ['string', 'null']
+                    'oneOf'       => [
+                        ['type' => 'null'],
+                        ['type' => 'string'],
+                    ],
                     'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                 ],
             ],
@@ -235,6 +270,163 @@ Example array output:
     ],
 ];
 ```
+
+## Polymorphic Arrays (anyOf)
+The generator also supports arrays that contain different types of DTOs using PHPDoc annotations like **@var list<Movie|Series>**.
+For example, if an actor can have a filmography that includes both movies and TV series, you can define it like this:
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+
+final class Actor
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly int $age,
+
+        #[Field(title: 'Biography', description: 'The biography of the actor')]
+        public readonly ?string $bio = null,
+
+        /**
+         * @var list<Movie|Series>|null
+         */
+        #[Field(title: 'Filmography', description: 'List of movies and series featuring the actor')]
+        public readonly ?array $filmography = null,
+
+        #[Field(title: 'Best Movie', description: 'The best movie of the actor')]
+        public readonly ?Movie $bestMovie = null,
+
+        #[Field(title: 'Best Series', description: 'The most prominent series of the actor')]
+        public readonly ?Series $bestSeries = null,
+    ) {}
+}
+```
+The generated schema will reflect this with an anyOf definition in the items section:
+```php
+[
+    'properties' => [
+        'filmography' => [
+            'title'       => 'Filmography',
+            'description' => 'List of movies and series featuring the actor',
+            'oneOf'       => [
+                ['type' => 'null'],
+                [
+                    'type'  => 'array',
+                    'items' => [
+                        'anyOf' => [
+                            ['$ref' => '#/definitions/Movie'],
+                            ['$ref' => '#/definitions/Series'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'definitions' => [
+        'Movie'  => [/* ... */],
+        'Series' => [/* ... */],
+    ],
+];
+```
+## Example DTO: Series
+Here's what the Series class might look like:
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Attribute\Format;
+
+final class Series
+{
+    public function __construct(
+        #[Field(title: 'Title', description: 'The title of the series')]
+        public readonly string $title,
+
+        #[Field(title: 'First Air Year', description: 'The year the series first aired')]
+        public readonly int $firstAirYear,
+
+        #[Field(title: 'Description', description: 'The description of the series')]
+        public readonly ?string $description = null,
+
+        #[Field(title: 'Creator', description: 'The creator or showrunner of the series')]
+        public readonly ?string $creator = null,
+
+        #[Field(title: 'Series Status', description: 'The current status of the series')]
+        public readonly ?SeriesStatus $status = null,
+
+        #[Field(title: 'First Air Date', description: 'The original release date of the series', format: Format::Date)]
+        public readonly ?string $firstAirDate = null,
+
+        #[Field(title: 'Last Air Date', description: 'The most recent air date of the series', format: Format::Date)]
+        public readonly ?string $lastAirDate = null,
+
+        #[Field(title: 'Seasons', description: 'Number of seasons released')]
+        public readonly ?int $seasons = null,
+    ) {}
+}
+```
+> **Note**
+> When using polymorphic arrays, make sure all referenced DTOs (e.g., Movie, Series)
+> are also annotated properly so their definitions can be generated correctly.
+
+## Union Types
+The JSON Schema Generator supports native PHP union types (introduced in PHP 8.0), including nullable and multi-type definitions.
+Here's an example DTO using union types:
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+
+final class FlexibleValue
+{
+    public function __construct(
+        #[Field(title: 'Value', description: 'Can be either string or integer')]
+        public readonly string|int $value,
+
+        #[Field(title: 'Optional Flag', description: 'Boolean or null')]
+        public readonly bool|null $flag = null,
+
+        #[Field(title: 'Flexible Field', description: 'Can be string, int, or null')]
+        public readonly string|int|null $flex = null,
+    ) {}
+}
+```
+The generated schema will include a `oneOf` section to reflect the union types:
+```php
+[
+    'properties' => [
+        'value' => [
+            'title'       => 'Value',
+            'description' => 'Can be either string or integer',
+            'oneOf'       => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+            ],
+        ],
+        'flag' => [
+            'title'       => 'Optional Flag',
+            'description' => 'Boolean or null',
+            'oneOf'       => [
+                ['type' => 'null'],
+                ['type' => 'boolean'],
+            ],
+        ],
+        'flex' => [
+            'title'       => 'Flexible Field',
+            'description' => 'Can be string, int, or null',
+            'oneOf'       => [
+                ['type' => 'null'],
+                ['type' => 'string'],
+                ['type' => 'integer'],
+            ],
+        ],
+    ],
+    'required' => ['value'],
+]
+```
+> **Note**
+> All supported types are automatically resolved from native PHP type declarations and reflected in the JSON Schema output using oneOf.
 
 ## Testing
 
