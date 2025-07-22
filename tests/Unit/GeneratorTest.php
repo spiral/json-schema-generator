@@ -50,11 +50,11 @@ final class GeneratorTest extends TestCase
                         'description' => 'The release status of the movie',
                         'oneOf'       => [
                             [
-                                'type' => 'null',
-                            ],
-                            [
                                 'type' => 'string',
                                 'enum' => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
+                            ],
+                            [
+                                'type' => 'null',
                             ],
                         ],
                     ],
@@ -108,7 +108,6 @@ final class GeneratorTest extends TestCase
                         'title'       => 'Filmography',
                         'description' => 'List of movies and series featuring the actor',
                         'oneOf'       => [
-                            ['type' => 'null'],
                             [
                                 'type'  => 'array',
                                 'items' => [
@@ -118,22 +117,23 @@ final class GeneratorTest extends TestCase
                                     ],
                                 ],
                             ],
+                            ['type' => 'null'],
                         ],
                     ],
                     'bestMovie' => [
                         'title'       => 'Best Movie',
                         'description' => 'The best movie of the actor',
                         'oneOf'       => [
-                            ['type' => 'null'],
                             ['$ref' => '#/definitions/Movie'],
+                            ['type' => 'null'],
                         ],
                     ],
                     'bestSeries' => [
                         'title'       => 'Best Series',
                         'description' => 'The most prominent series of the actor',
                         'oneOf'       => [
-                            ['type' => 'null'],
                             ['$ref' => '#/definitions/Series'],
+                            ['type' => 'null'],
                         ],
                     ],
                 ],
@@ -183,7 +183,6 @@ final class GeneratorTest extends TestCase
                                 'title'       => 'Release Status',
                                 'description' => 'The release status of the movie',
                                 'oneOf'       => [
-                                    ['type' => 'null'],
                                     [
                                         'type' => 'string',
                                         'enum' => [
@@ -195,6 +194,7 @@ final class GeneratorTest extends TestCase
                                             'Canceled',
                                         ],
                                     ],
+                                    ['type' => 'null'],
                                 ],
                             ],
                         ],
@@ -234,7 +234,6 @@ final class GeneratorTest extends TestCase
                                 'title'       => 'Series Status',
                                 'description' => 'The current status of the series',
                                 'oneOf'       => [
-                                    ['type' => 'null'],
                                     [
                                         'type' => 'string',
                                         'enum' => [
@@ -245,6 +244,7 @@ final class GeneratorTest extends TestCase
                                             'Hiatus',
                                         ],
                                     ],
+                                    ['type' => 'null'],
                                 ],
                             ],
                             'firstAirDate' => [
@@ -269,8 +269,8 @@ final class GeneratorTest extends TestCase
                                 'title'       => 'Seasons',
                                 'description' => 'Number of seasons released',
                                 'oneOf'       => [
-                                    ['type' => 'null'],
                                     ['type' => 'integer'],
+                                    ['type' => 'null'],
                                 ],
                             ],
                         ],
@@ -295,25 +295,25 @@ final class GeneratorTest extends TestCase
                         'title' => 'Value',
                         'description' => 'Can be either string or integer',
                         'oneOf' => [
-                            ['type' => 'string'],
                             ['type' => 'integer'],
+                            ['type' => 'string'],
                         ],
                     ],
                     'flag' => [
                         'title' => 'Optional Flag',
                         'description' => 'Boolean or null',
                         'oneOf' => [
-                            ['type' => 'null'],
                             ['type' => 'boolean'],
+                            ['type' => 'null'],
                         ],
                     ],
                     'flex' => [
                         'title' => 'Flexible Field',
                         'description' => 'Can be string, int, or null',
                         'oneOf' => [
+                            ['type' => 'integer'],
                             ['type' => 'null'],
                             ['type' => 'string'],
-                            ['type' => 'integer'],
                         ],
                     ],
                 ],

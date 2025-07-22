@@ -6,13 +6,18 @@ namespace Spiral\JsonSchemaGenerator\Parser;
 
 use Spiral\JsonSchemaGenerator\Exception\GeneratorException;
 use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
-use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type as TypeInfoType;
 
 /**
  * @internal
@@ -26,7 +31,7 @@ final class ClassParser implements ClassParserInterface
      */
     private array $constructorParameters = [];
 
-    private readonly PropertyInfoExtractorInterface $propertyInfo;
+    private readonly PropertyTypeExtractorInterface $propertyInfo;
 
     /**
      * @param \ReflectionClass|class-string $class
@@ -125,101 +130,74 @@ final class ClassParser implements ClassParserInterface
         );
     }
 
-    /**
-     * @param non-empty-string $typeName
-     */
-    private function getTypeBuildIn(string $typeName): bool
-    {
-        if ((\class_exists($typeName))) {
-            return \is_subclass_of($typeName, \BackedEnum::class);
-        }
-
-        return $typeName !== SchemaType::Object->value;
-    }
-
-    /**
-     * @param non-empty-string|class-string $typeName
-     *
-     * @return non-empty-string|class-string
-     */
-    private function getEnumTypeName(string $typeName): string
-    {
-        if (!\is_subclass_of($typeName, \BackedEnum::class)) {
-            return $typeName;
-        }
-
-        $reflection = new \ReflectionEnum($typeName);
-        $backingType = $reflection->getBackingType();
-
-        if (!$backingType instanceof \ReflectionNamedType) {
-            return $typeName;
-        }
-
-        return $backingType->getName();
-    }
-
     private function getPropertyType(\ReflectionProperty $property): Type
     {
-        /** @psalm-suppress DeprecatedMethod, DeprecatedClass */
-        $types = $this->propertyInfo->getTypes($property->class, $property->getName());
+        $type = $this->propertyInfo->getType($property->class, $property->getName());
 
+        if ($type === null) {
+            throw new InvalidTypeException();
+        }
+
+        return $this->createType($type);
+    }
+
+    private function createType(TypeInfoType $type): Type
+    {
         $simpleTypes = [];
-        $isNullable = false;
-        foreach ($types ?? [] as $type) {
-            $typeName = $type->getBuiltinType() === SchemaType::Object->value && $type->getClassName() !== null
-                ? $type->getClassName()
-                : $type->getBuiltinType();
-
-            if ($typeName === '') {
-                throw new InvalidTypeException();
+        if ($type instanceof UnionType) {
+            foreach ($type->getTypes() as $subType) {
+                $simpleType = $this->createSimpleType($subType);
+                if ($simpleType !== null) {
+                    $simpleTypes[] = $simpleType;
+                }
             }
-            if ($type->isNullable() && $isNullable === false) {
-                $simpleTypes[] = new SimpleType(
-                    name: SchemaType::Null->value,
-                    builtin: true,
-                );
-                $isNullable = true;
+        } else {
+            $simpleType = $this->createSimpleType($type);
+            if ($simpleType !== null) {
+                $simpleTypes[] = $simpleType;
             }
-
-            $simpleTypes[] = new SimpleType(
-                name: $this->getEnumTypeName($typeName),
-                builtin: $this->getTypeBuildIn($typeName),
-                collectionType: $this->getCollectionValueType($type),
-                enum: $this->getEnumValues($typeName),
-            );
         }
 
         return new Type(types: $simpleTypes);
     }
 
-    /**
-     * @psalm-suppress DeprecatedClass
-     */
-    private function getCollectionValueType(PropertyInfoType $propertyInfoType): ?Type
+    private function createSimpleType(TypeInfoType $type): ?SimpleType
     {
-        if (!$propertyInfoType->isCollection()) {
-            return null;
-        }
-
-        $simpleTypes = [];
-        /** @psalm-suppress DeprecatedClass */
-        foreach ($propertyInfoType->getCollectionValueTypes() as $collectionValueType) {
-            $typeName = $collectionValueType->getBuiltinType() === SchemaType::Object->value && $collectionValueType->getClassName() !== null
-                ? $collectionValueType->getClassName()
-                : $collectionValueType->getBuiltinType();
-
-            if ($typeName === '') {
-                throw new InvalidTypeException();
+        $typeName = '';
+        $builtin = true;
+        $enum = null;
+        $collectionType = null;
+        if ($type instanceof BuiltinType) {
+            if ($type->getTypeIdentifier() === TypeIdentifier::MIXED) {
+                return null;
             }
-
-            $simpleTypes[] = new SimpleType(
-                name: $this->getEnumTypeName($typeName),
-                builtin: $this->getTypeBuildIn($typeName),
-                enum: $this->getEnumValues($typeName),
-            );
+            $typeName = $type->getTypeIdentifier()->value;
+        }
+        if ($type instanceof CollectionType) {
+            $typeName = TypeIdentifier::ARRAY->value;
+            $collectionType = $this->createType($type->getCollectionValueType());
+        }
+        if ($type instanceof ObjectType) {
+            $typeName = $type->getClassName();
+            $builtin = false;
         }
 
-        return new Type(types: $simpleTypes);
+        if ($type instanceof BackedEnumType) {
+            $enum = $this->getEnumValues($type->getClassName());
+            $typeName = $type->getBackingType()->getTypeIdentifier()->value;
+            $builtin = true;
+        }
+
+        if ($typeName === '') {
+            throw new InvalidTypeException();
+        }
+
+        return new SimpleType(
+            name: $typeName,
+            builtin: $builtin,
+            collectionType: $collectionType,
+            enum: $enum,
+        );
     }
 
     private function hasPropertyDefaultValue(\ReflectionProperty $property): bool
@@ -243,7 +221,7 @@ final class ClassParser implements ClassParserInterface
         return $default ?? null;
     }
 
-    private function createPropertyInfo(): PropertyInfoExtractorInterface
+    private function createPropertyInfo(): PropertyTypeExtractorInterface
     {
         return new PropertyInfoExtractor(typeExtractors: [
             new PhpStanExtractor(),

@@ -16,7 +16,7 @@ Main use case - structured output definition for LLMs.
 
 Make sure that your server is configured with the following PHP versions and extensions:
 
-- PHP >=8.1
+- PHP >=8.3
 
 ## Installation
 

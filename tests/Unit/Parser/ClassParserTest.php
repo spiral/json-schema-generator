@@ -193,14 +193,15 @@ final class ClassParserTest extends TestCase
         $this->assertNull($properties[3]->getDefaultValue());
 
         $this->assertSame('releaseStatus', $properties[4]->getName());
-        $this->assertSame(Type::String, $properties[4]->getType()->types[1]->getName());
-        $this->assertTrue($properties[4]->getType()->types[1]->isEnum());
+        $this->assertSame(Type::String, $properties[4]->getType()->types[0]->getName());
+        $this->assertSame(Type::Null, $properties[4]->getType()->types[1]->getName());
+        $this->assertTrue($properties[4]->getType()->types[0]->isEnum());
         $this->assertEquals(
             ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
-            $properties[4]->getType()->types[1]->getEnumValues(),
+            $properties[4]->getType()->types[0]->getEnumValues(),
         );
         $this->assertTrue($properties[4]->getType()->allowsNull());
-        $this->assertFalse($properties[4]->getType()->types[1]->isCollection());
+        $this->assertFalse($properties[4]->getType()->types[0]->isCollection());
         $this->assertTrue($properties[4]->hasDefaultValue());
         $this->assertNull($properties[4]->getDefaultValue());
     }
