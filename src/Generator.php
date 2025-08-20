@@ -19,11 +19,15 @@ use Spiral\JsonSchemaGenerator\Validation\ValidationConstraintExtractor;
 class Generator implements GeneratorInterface
 {
     protected array $cache = [];
+    private readonly ValidationConstraintExtractor $validationExtractor;
 
     public function __construct(
         protected readonly ParserInterface $parser = new Parser(),
-        protected readonly ValidationConstraintExtractor $validationExtractor = new ValidationConstraintExtractor(),
-    ) {}
+        ?ValidationConstraintExtractor $validationExtractor = null,
+        protected readonly GeneratorConfig $config = new GeneratorConfig(),
+    ) {
+        $this->validationExtractor = $validationExtractor ?? new ValidationConstraintExtractor();
+    }
 
     /**
      * @param class-string|\ReflectionClass $class
@@ -124,8 +128,11 @@ class Generator implements GeneratorInterface
         $type = $property->getType();
         $propertyTypes = $this->extractPropertyTypes($type);
 
-        // NEW: Extract validation constraints from PHPDoc
-        $validationRules = $this->extractValidationConstraints($property, $propertyTypes);
+        // Extract validation constraints from PHPDoc (if enabled)
+        $validationRules = [];
+        if ($this->config->enableValidationConstraints) {
+            $validationRules = $this->extractValidationConstraints($property, $propertyTypes);
+        }
 
         return new Property(
             types: $propertyTypes,
@@ -134,7 +141,7 @@ class Generator implements GeneratorInterface
             required: $default === null && !$type->allowsNull(),
             default: $default,
             format: $format,
-            validationRules: $validationRules, // NEW: Add validation rules
+            validationRules: $validationRules,
         );
     }
 
