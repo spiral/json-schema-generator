@@ -80,11 +80,12 @@ final class DocBlockParser
     private function parseArrayShape(string $shapeStr): array
     {
         $shape = [];
-        $elements = \array_map('trim', \explode(',', $shapeStr));
+        $elements = \array_map(\trim(...), \explode(',', $shapeStr));
 
         foreach ($elements as $element) {
             if (\str_contains($element, ':')) {
-                [$key, $valueType] = \array_map('trim', \explode(':', $element, 2));
+                /** @psalm-suppress PossiblyUndefinedArrayOffset */
+                [$key, $valueType] = \array_map(\trim(...), \explode(':', $element, 2));
                 $shape[$key] = $valueType;
             }
         }

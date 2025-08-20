@@ -38,11 +38,11 @@ final class ConstraintMapper
     {
         return match (true) {
             \in_array($constraint, ['positive-int', 'negative-int', 'non-positive-int', 'non-negative-int'], true) =>
-                new NumericConstraint($constraint),
+            new NumericConstraint($constraint),
             \in_array($constraint, ['non-empty-string', 'numeric-string', 'class-string'], true) =>
-                new StringConstraint($constraint),
+            new StringConstraint($constraint),
             \in_array($constraint, ['non-empty-array', 'non-empty-list'], true) =>
-                new ArrayConstraint($constraint),
+            new ArrayConstraint($constraint),
             default => null,
         };
     }
@@ -50,7 +50,7 @@ final class ConstraintMapper
     private function createConstraintObjectFromArray(array $constraint): ?AbstractConstraint
     {
         $type = \array_key_first($constraint);
-        $value = $constraint[$type];
+        $value = $type !== null ? $constraint[$type] : null;
 
         return match ($type) {
             'int-range' => new NumericConstraint($type, $value),
