@@ -7,8 +7,10 @@
 [![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 
-The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/) from Data Transfer Object (DTO) classes.
-It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title, description, and default value.
+The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/)
+from Data Transfer Object (DTO) classes.
+It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title,
+description, and default value.
 
 Main use case - structured output definition for LLMs.
 
@@ -32,7 +34,7 @@ To generate a schema for a DTO, instantiate the `Spiral\JsonSchemaGenerator\Gene
 passing the DTO class as an argument (fully qualified class name or reflection). The method will return an instance of
 `Spiral\JsonSchemaGenerator\Schema`.
 
-Let's create a simple data transfer object:
+Let's create a simple DTO:
 
 ```php
 namespace App\DTO;
@@ -84,7 +86,8 @@ $schema = $generator->generate(Movie::class);
 ```
 
 > **Note**
-> Additionally, the package provides the `Spiral\JsonSchemaGenerator\GeneratorInterface,` which can be integrated into your application's dependency container for further customization and flexibility.
+> Additionally, the package provides the `Spiral\JsonSchemaGenerator\GeneratorInterface,` which can be integrated into
+> your application's dependency container for further customization and flexibility.
 
 The `Spiral\JsonSchemaGenerator\Schema` object implements the **JsonSerializable** interface, allowing easy conversion
 of the schema into either JSON or a PHP array.
@@ -272,8 +275,11 @@ Example array output:
 ```
 
 ## Polymorphic Arrays (anyOf)
-The generator also supports arrays that contain different types of DTOs using PHPDoc annotations like **@var list<Movie|Series>**.
+
+The generator also supports arrays that contain different types of DTOs using PHPDoc annotations like **@var list<
+Movie|Series>**.
 For example, if an actor can have a filmography that includes both movies and TV series, you can define it like this:
+
 ```php
 namespace App\DTO;
 
@@ -302,7 +308,9 @@ final class Actor
     ) {}
 }
 ```
+
 The generated schema will reflect this with an anyOf definition in the items section:
+
 ```php
 [
     'properties' => [
@@ -329,8 +337,11 @@ The generated schema will reflect this with an anyOf definition in the items sec
     ],
 ];
 ```
+
 ## Example DTO: Series
+
 Here's what the Series class might look like:
+
 ```php
 namespace App\DTO;
 
@@ -366,13 +377,17 @@ final class Series
     ) {}
 }
 ```
+
 > **Note**
 > When using polymorphic arrays, make sure all referenced DTOs (e.g., Movie, Series)
 > are also annotated properly so their definitions can be generated correctly.
 
 ## Union Types
-The JSON Schema Generator supports native PHP union types (introduced in PHP 8.0), including nullable and multi-type definitions.
+
+The JSON Schema Generator supports native PHP union types (introduced in PHP 8.0), including nullable and multi-type
+definitions.
 Here's an example DTO using union types:
+
 ```php
 namespace App\DTO;
 
@@ -392,7 +407,9 @@ final class FlexibleValue
     ) {}
 }
 ```
+
 The generated schema will include a `oneOf` section to reflect the union types:
+
 ```php
 [
     'properties' => [
@@ -425,8 +442,409 @@ The generated schema will include a `oneOf` section to reflect the union types:
     'required' => ['value'],
 ]
 ```
+
 > **Note**
-> All supported types are automatically resolved from native PHP type declarations and reflected in the JSON Schema output using oneOf.
+> All supported types are automatically resolved from native PHP type declarations and reflected in the JSON Schema
+> output using oneOf.
+
+## PHPDoc Validation Constraints
+
+Generator supports extracting validation constraints from PHPDoc comments, providing rich validation
+rules directly in your generated schemas.
+
+### Supported PHPDoc Constraints
+
+#### Numeric Constraints
+
+- `positive-int` - Integer greater than 0
+- `negative-int` - Integer less than 0
+- `non-positive-int` - Integer less than or equal to 0
+- `non-negative-int` - Integer greater than or equal to 0
+- `int<min, max>` - Integer within a specific range
+
+#### String Constraints
+
+- `non-empty-string` - String with minimum length of 1
+- `numeric-string` - String containing only numeric characters
+- `class-string` - Valid PHP class name string
+
+#### Array Constraints
+
+- `non-empty-array` - Array with at least one element
+- `non-empty-list` - List with at least one element
+- `array{key: type, ...}` - Shaped arrays with specific structure
+
+### Example Usage
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+
+final class ValidatedUser
+{
+    public function __construct(
+        #[Field(title: 'Name', description: 'User full name')]
+        /** @var non-empty-string */
+        public readonly string $name,
+        
+        #[Field(title: 'Age', description: 'User age')]
+        /** @var positive-int */
+        public readonly int $age,
+        
+        #[Field(title: 'Score', description: 'User score between 0 and 100')]
+        /** @var int<0, 100> */
+        public readonly int $score,
+        
+        #[Field(title: 'Email', description: 'User email address')]
+        /** @var non-empty-string */
+        public readonly string $email,
+        
+        #[Field(title: 'Phone Number', description: 'Numeric phone number')]
+        /** @var numeric-string */
+        public readonly string $phone,
+        
+        #[Field(title: 'Tags', description: 'User tags')]
+        /** @var non-empty-array<string> */
+        public readonly array $tags = [],
+        
+        #[Field(title: 'Preferences', description: 'User preferences')]
+        /** @var array{theme: string, notifications: bool} */
+        public readonly array $preferences = [],
+    ) {}
+}
+```
+
+The generated schema will include validation constraints:
+
+```php
+[
+    'properties' => [
+        'name' => [
+            'title' => 'Name',
+            'description' => 'User full name', 
+            'type' => 'string',
+            'minLength' => 1, // from non-empty-string
+        ],
+        'age' => [
+            'title' => 'Age',
+            'description' => 'User age',
+            'type' => 'integer', 
+            'minimum' => 1, // from positive-int
+        ],
+        'score' => [
+            'title' => 'Score',
+            'description' => 'User score between 0 and 100',
+            'type' => 'integer',
+            'minimum' => 0, // from int<0, 100>
+            'maximum' => 100,
+        ],
+        'phone' => [
+            'title' => 'Phone Number', 
+            'description' => 'Numeric phone number',
+            'type' => 'string',
+            'pattern' => '^[0-9]*\.?[0-9]+$', // from numeric-string
+        ],
+        'tags' => [
+            'title' => 'Tags',
+            'description' => 'User tags', 
+            'type' => 'array',
+            'items' => ['type' => 'string'],
+            'minItems' => 1, // from non-empty-array
+            'default' => [],
+        ],
+        'preferences' => [
+            'title' => 'Preferences',
+            'description' => 'User preferences',
+            'type' => 'object', // from array-shape constraint
+            'properties' => [
+                'theme' => ['type' => 'string'],
+                'notifications' => ['type' => 'boolean'],
+            ],
+            'required' => ['theme', 'notifications'],
+            'additionalProperties' => false,
+            'default' => [],
+        ],
+    ],
+    'required' => ['name', 'age', 'score', 'email', 'phone'],
+]
+```
+
+## Format Support
+
+The generator supports JSON Schema format validation through the `Format` enum:
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Schema\Format;
+
+final class ContactInfo  
+{
+    public function __construct(
+        #[Field(title: 'Email', description: 'User email address', format: Format::Email)]
+        public readonly string $email,
+        
+        #[Field(title: 'Website', description: 'Personal website', format: Format::Uri)]
+        public readonly ?string $website = null,
+        
+        #[Field(title: 'Birth Date', description: 'Date of birth', format: Format::Date)]
+        public readonly ?string $birthDate = null,
+        
+        #[Field(title: 'Last Login', description: 'Last login timestamp', format: Format::DateTime)]
+        public readonly ?string $lastLogin = null,
+    ) {}
+}
+```
+
+### Available Formats
+
+- `Format::Date` - Date format (YYYY-MM-DD)
+- `Format::Time` - Time format (HH:MM:SS)
+- `Format::DateTime` - Date-time format (ISO 8601)
+- `Format::Duration` - Duration format
+- `Format::Email` - Email address format
+- `Format::Hostname` - Hostname format
+- `Format::Ipv4` - IPv4 address format
+- `Format::Ipv6` - IPv6 address format
+- `Format::Uri` - URI format
+- `Format::UriReference` - URI reference format
+- `Format::Uuid` - UUID format
+- `Format::Regex` - Regular expression format
+
+## Configuration Options
+
+You can configure the generator behavior using the `GeneratorConfig` class:
+
+```php
+use Spiral\JsonSchemaGenerator\Generator;
+use Spiral\JsonSchemaGenerator\GeneratorConfig;
+
+// Enable validation constraints (default: true)
+$config = new GeneratorConfig(enableValidationConstraints: true);
+$generator = new Generator(config: $config);
+
+// Disable validation constraints for performance
+$config = new GeneratorConfig(enableValidationConstraints: false); 
+$generator = new Generator(config: $config);
+```
+
+### Configuration Options
+
+- `enableValidationConstraints` (bool, default: true) - Enable/disable PHPDoc validation constraint extraction
+
+When `enableValidationConstraints` is disabled, the generator will skip parsing PHPDoc comments for validation rules,
+which can improve performance for large schemas where validation constraints are not needed.
+
+## Integration with Valinor
+
+The JSON Schema Generator works perfectly with the [Valinor PHP package](https://github.com/CuyZ/Valinor) for complete
+data mapping and validation workflows. Valinor can validate incoming data based on the same PHPDoc constraints that the
+generator uses to create JSON schemas.
+
+### Installation
+
+First, install Valinor alongside the JSON Schema Generator:
+
+```bash
+composer require cuyz/valinor spiral/json-schema-generator
+```
+
+### Complete Schema and Mapping Solution
+
+Here's a complete example showing how to combine both packages:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use CuyZ\Valinor\Mapper\TreeMapper;
+use Spiral\JsonSchemaGenerator\Generator as JsonSchemaGenerator;
+
+final readonly class SchemaMapper
+{
+    public function __construct(
+        private JsonSchemaGenerator $generator,
+        private TreeMapper $mapper,
+    ) {}
+
+    public function toJsonSchema(string $class): array
+    {
+        if (\json_validate($class)) {
+            return \json_decode($class, associative: true);
+        }
+
+        if (\class_exists($class)) {
+            return $this->generator->generate($class)->jsonSerialize();
+        }
+
+        throw new \InvalidArgumentException(\sprintf('Invalid class or JSON schema provided: %s', $class));
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T>|null $class
+     * @return T
+     */
+    public function toObject(string $json, ?string $class = null): object
+    {
+        if ($class === null) {
+            return \json_decode($json, associative: false);
+        }
+
+        return $this->mapper->map($class, \json_decode($json, associative: true));
+    }
+}
+```
+
+### Usage Example
+
+```php
+use CuyZ\Valinor\MapperBuilder;
+use Spiral\JsonSchemaGenerator\Generator;
+
+// Set up the mapper with flexible casting and permissive types
+$treeMapper = (new MapperBuilder())
+    ->enableFlexibleCasting()
+    ->allowPermissiveTypes()
+    ->build();
+
+$mapper = new SchemaMapper(
+    generator: new Generator(), 
+    mapper: $treeMapper
+);
+
+// Generate JSON schema for your DTO
+$schema = $mapper->toJsonSchema(ValidatedUser::class);
+
+// Convert incoming JSON to validated DTO
+$payload = $request->getBody();
+$user = $mapper->toObject($payload, ValidatedUser::class);
+```
+
+### Benefits of This Integration
+
+1. **Consistent Validation**: Both packages respect the same PHPDoc validation constraints
+2. **Schema Generation**: Generate JSON schemas for API documentation or LLM structured output
+3. **Data Mapping**: Safely convert incoming JSON data to strongly-typed PHP DTOs
+4. **Runtime Validation**: Valinor validates data against the same constraints used in schema generation
+5. **Error Handling**: Get detailed validation errors when data doesn't match your DTO structure
+
+### Real-world Example
+
+```php
+use App\DTO\ValidatedUser;
+
+// Your DTO with PHPDoc constraints
+final readonly class ValidatedUser
+{
+    public function __construct(
+        /** @var non-empty-string */
+        public string $name,
+        /** @var positive-int */
+        public int $age,
+        /** @var int<0, 100> */
+        public int $score,
+    ) {}
+}
+
+// Generate schema (e.g., for OpenAPI documentation)
+$schema = $mapper->toJsonSchema(ValidatedUser::class);
+// Returns JSON schema with minLength, minimum constraints, etc.
+
+// Validate and map incoming data
+$jsonPayload = '{"name": "John Doe", "age": 25, "score": 85}';
+$user = $mapper->toObject($jsonPayload, ValidatedUser::class);
+// Returns ValidatedUser instance or throws validation exception
+
+// Invalid data example
+$invalidPayload = '{"name": "", "age": -5, "score": 150}';
+$user = $mapper->toObject($invalidPayload, ValidatedUser::class);
+// Throws validation exception: empty name, negative age, score out of range
+```
+
+### API Endpoint Example
+
+This integration is particularly useful for API endpoints:
+
+```php
+#[Route('/users', methods: ['POST'])]
+public function createUser(ServerRequestInterface $request): ResponseInterface
+{
+    try {
+        // Map and validate incoming JSON to DTO
+        $user = $this->mapper->toObject(
+            $request->getBody()->getContents(),
+            ValidatedUser::class
+        );
+        
+        // Process the validated user data
+        $this->userService->create($user);
+        
+        return new JsonResponse(['success' => true]);
+        
+    } catch (\CuyZ\Valinor\Mapper\MappingError $e) {
+        // Handle validation errors
+        return new JsonResponse([
+            'error' => 'Validation failed',
+            'details' => $e->getMessage()
+        ], 400);
+    }
+}
+```
+
+### Advanced Configuration
+
+You can configure both packages to work optimally together:
+
+```php
+use CuyZ\Valinor\MapperBuilder;
+use Spiral\JsonSchemaGenerator\Generator;
+use Spiral\JsonSchemaGenerator\GeneratorConfig;
+
+// Configure the JSON Schema Generator
+$generatorConfig = new GeneratorConfig(
+    enableValidationConstraints: true // Enable PHPDoc constraint extraction
+);
+
+// Configure Valinor mapper with flexible options
+$treeMapper = (new MapperBuilder())
+    ->enableFlexibleCasting()           // Allow flexible type casting
+    ->allowPermissiveTypes()            // Allow permissive type handling
+    ->allowSuperfluousKeys()            // Ignore extra keys in input
+    ->build();
+
+$mapper = new SchemaMapper(
+    generator: new Generator(config: $generatorConfig),
+    mapper: $treeMapper
+);
+```
+
+### Error Handling
+
+Both packages provide detailed error information:
+
+```php
+try {
+    $user = $mapper->toObject($jsonPayload, ValidatedUser::class);
+} catch (\CuyZ\Valinor\Mapper\MappingError $e) {
+    // Get detailed validation errors
+    $errors = [];
+    foreach ($e->node()->messages() as $message) {
+        $errors[] = [
+            'path' => $message->node()->path(),
+            'message' => (string) $message,
+        ];
+    }
+    
+    // Log or return structured error response
+    return new JsonResponse(['validation_errors' => $errors], 400);
+}
+```
 
 ## Testing
 
