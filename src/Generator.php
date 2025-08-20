@@ -15,18 +15,22 @@ use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
 use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Validation\ValidationConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
 
 final class Generator implements GeneratorInterface
 {
     protected array $cache = [];
     private readonly ValidationConstraintExtractor $validationExtractor;
+    private readonly AttributeConstraintExtractor $attributeExtractor;
 
     public function __construct(
         protected readonly ParserInterface $parser = new Parser(),
         ?ValidationConstraintExtractor $validationExtractor = null,
         protected readonly GeneratorConfig $config = new GeneratorConfig(),
+        ?AttributeConstraintExtractor $attributeExtractor = null,
     ) {
         $this->validationExtractor = $validationExtractor ?? new ValidationConstraintExtractor();
+        $this->attributeExtractor = $attributeExtractor ?? new AttributeConstraintExtractor();
     }
 
     /**
@@ -132,6 +136,10 @@ final class Generator implements GeneratorInterface
         $validationRules = [];
         if ($this->config->enableValidationConstraints) {
             $validationRules = $this->extractValidationConstraints($property, $propertyTypes);
+            $validationRules = \array_merge(
+                $validationRules,
+                $this->extractAttributeConstraints($property, $propertyTypes),
+            );
         }
 
         return new Property(
@@ -173,6 +181,23 @@ final class Generator implements GeneratorInterface
         foreach ($propertyTypes as $propertyType) {
             if ($propertyType->type instanceof Schema\Type) {
                 $validationRules = $this->validationExtractor->extractValidationRules($property, $propertyType->type);
+                $allValidationRules = \array_merge($allValidationRules, $validationRules);
+            }
+        }
+
+        return $allValidationRules;
+    }
+
+    /**
+     * Extract validation constraints from property attributes
+     */
+    private function extractAttributeConstraints(PropertyInterface $property, array $propertyTypes): array
+    {
+        $allValidationRules = [];
+
+        foreach ($propertyTypes as $propertyType) {
+            if ($propertyType->type instanceof Schema\Type) {
+                $validationRules = $this->attributeExtractor->extractValidationRules($property, $propertyType->type);
                 $allValidationRules = \array_merge($allValidationRules, $validationRules);
             }
         }
