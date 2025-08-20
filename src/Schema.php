@@ -6,6 +6,9 @@ namespace Spiral\JsonSchemaGenerator;
 
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 
+/**
+ * @internal
+ */
 final class Schema extends AbstractDefinition
 {
     private array $definitions = [];

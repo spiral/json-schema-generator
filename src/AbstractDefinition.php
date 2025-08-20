@@ -6,6 +6,9 @@ namespace Spiral\JsonSchemaGenerator;
 
 use Spiral\JsonSchemaGenerator\Schema\Property;
 
+/**
+ * @internal
+ */
 abstract class AbstractDefinition implements \JsonSerializable
 {
     /**

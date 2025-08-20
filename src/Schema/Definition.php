@@ -7,6 +7,9 @@ namespace Spiral\JsonSchemaGenerator\Schema;
 use Spiral\JsonSchemaGenerator\AbstractDefinition;
 use Spiral\JsonSchemaGenerator\Exception\DefinitionException;
 
+/**
+ * @internal
+ */
 final class Definition extends AbstractDefinition
 {
     /**

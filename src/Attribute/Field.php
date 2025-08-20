@@ -7,12 +7,12 @@ namespace Spiral\JsonSchemaGenerator\Attribute;
 use Spiral\JsonSchemaGenerator\Schema\Format;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-class Field
+readonly class Field
 {
     public function __construct(
-        public readonly string $title = '',
-        public readonly string $description = '',
-        public readonly mixed $default = null,
-        public readonly ?Format $format = null,
+        public string $title = '',
+        public string $description = '',
+        public mixed $default = null,
+        public ?Format $format = null,
     ) {}
 }
