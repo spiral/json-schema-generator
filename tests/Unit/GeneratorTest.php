@@ -21,54 +21,61 @@ final class GeneratorTest extends TestCase
             [
                 'type' => 'object',
                 'properties' => [
-                    'title'         => [
-                        'title'       => 'Title',
+                    'title' => [
+                        'title' => 'Title',
                         'description' => 'The title of the movie',
-                        'type'        => 'string',
+                        'type' => 'string',
                     ],
-                    'year'          => [
-                        'title'       => 'Year',
+                    'year' => [
+                        'title' => 'Year',
                         'description' => 'The year of the movie',
-                        'type'        => 'integer',
+                        'type' => 'integer',
                     ],
-                    'description'   => [
-                        'title'       => 'Description',
+                    'description' => [
+                        'title' => 'Description',
                         'description' => 'The description of the movie',
-                        'oneOf'       => [
+                        'oneOf' => [
                             ['type' => 'null'],
                             ['type' => 'string'],
                         ],
                     ],
-                    'director'      => [
+                    'director' => [
                         'oneOf' => [
                             ['type' => 'null'],
                             ['type' => 'string'],
                         ],
                     ],
                     'releaseStatus' => [
-                        'title'       => 'Release Status',
+                        'title' => 'Release Status',
                         'description' => 'The release status of the movie',
-                        'oneOf'       => [
+                        'oneOf' => [
                             [
                                 'type' => 'string',
-                                'enum' => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
+                                'enum' => [
+                                    'Released',
+                                    'Rumored',
+                                    'Post Production',
+                                    'In Production',
+                                    'Planned',
+                                    'Canceled',
+                                ],
                             ],
                             [
                                 'type' => 'null',
                             ],
                         ],
                     ],
-                    'releaseDate'      => [
-                        'oneOf'       => [
+                    'releaseDate' => [
+                        'oneOf' => [
                             ['type' => 'null'],
                             ['type' => 'string'],
                         ],
-                        'format'      => 'date',
-                        'title'       => 'Release date',
+                        'format' => 'date',
+                        'title' => 'Release date',
                         'description' => 'The release date of the movie',
                     ],
                 ],
-                'required'    => [
+                'required' => [
                     'title',
                     'year',
                 ],
@@ -85,31 +92,31 @@ final class GeneratorTest extends TestCase
         $this->assertEquals(
             [
                 'type' => 'object',
-                'properties'  => [
+                'properties' => [
                     'name' => [
-                        'type'        => 'string',
-                        'title'       => 'Name',
+                        'type' => 'string',
+                        'title' => 'Name',
                         'description' => 'The name of the actor',
                     ],
                     'age' => [
-                        'type'        => 'integer',
-                        'title'       => 'Age',
+                        'type' => 'integer',
+                        'title' => 'Age',
                         'description' => 'The age of the actor',
                     ],
                     'bio' => [
-                        'title'       => 'Biography',
+                        'title' => 'Biography',
                         'description' => 'The biography of the actor',
-                        'oneOf'       => [
+                        'oneOf' => [
                             ['type' => 'null'],
                             ['type' => 'string'],
                         ],
                     ],
                     'filmography' => [
-                        'title'       => 'Filmography',
+                        'title' => 'Filmography',
                         'description' => 'List of movies and series featuring the actor',
-                        'oneOf'       => [
+                        'oneOf' => [
                             [
-                                'type'  => 'array',
+                                'type' => 'array',
                                 'items' => [
                                     'anyOf' => [
                                         ['$ref' => '#/definitions/Movie'],
@@ -121,17 +128,17 @@ final class GeneratorTest extends TestCase
                         ],
                     ],
                     'bestMovie' => [
-                        'title'       => 'Best Movie',
+                        'title' => 'Best Movie',
                         'description' => 'The best movie of the actor',
-                        'oneOf'       => [
+                        'oneOf' => [
                             ['$ref' => '#/definitions/Movie'],
                             ['type' => 'null'],
                         ],
                     ],
                     'bestSeries' => [
-                        'title'       => 'Best Series',
+                        'title' => 'Best Series',
                         'description' => 'The most prominent series of the actor',
-                        'oneOf'       => [
+                        'oneOf' => [
                             ['$ref' => '#/definitions/Series'],
                             ['type' => 'null'],
                         ],
@@ -143,23 +150,23 @@ final class GeneratorTest extends TestCase
                 ],
                 'definitions' => [
                     'Movie' => [
-                        'title'      => 'Movie',
-                        'type'       => 'object',
+                        'title' => 'Movie',
+                        'type' => 'object',
                         'properties' => [
                             'title' => [
-                                'title'       => 'Title',
+                                'title' => 'Title',
                                 'description' => 'The title of the movie',
-                                'type'        => 'string',
+                                'type' => 'string',
                             ],
                             'year' => [
-                                'title'       => 'Year',
+                                'title' => 'Year',
                                 'description' => 'The year of the movie',
-                                'type'        => 'integer',
+                                'type' => 'integer',
                             ],
                             'description' => [
-                                'title'       => 'Description',
+                                'title' => 'Description',
                                 'description' => 'The description of the movie',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     ['type' => 'null'],
                                     ['type' => 'string'],
                                 ],
@@ -171,18 +178,18 @@ final class GeneratorTest extends TestCase
                                 ],
                             ],
                             'releaseDate' => [
-                                'title'       => 'Release date',
+                                'title' => 'Release date',
                                 'description' => 'The release date of the movie',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     ['type' => 'null'],
                                     ['type' => 'string'],
                                 ],
                                 'format' => 'date',
                             ],
                             'releaseStatus' => [
-                                'title'       => 'Release Status',
+                                'title' => 'Release Status',
                                 'description' => 'The release status of the movie',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     [
                                         'type' => 'string',
                                         'enum' => [
@@ -201,39 +208,39 @@ final class GeneratorTest extends TestCase
                         'required' => ['title', 'year'],
                     ],
                     'Series' => [
-                        'title'      => 'Series',
-                        'type'       => 'object',
+                        'title' => 'Series',
+                        'type' => 'object',
                         'properties' => [
                             'title' => [
-                                'title'       => 'Title',
+                                'title' => 'Title',
                                 'description' => 'The title of the series',
-                                'type'        => 'string',
+                                'type' => 'string',
                             ],
                             'firstAirYear' => [
-                                'title'       => 'First Air Year',
+                                'title' => 'First Air Year',
                                 'description' => 'The year the series first aired',
-                                'type'        => 'integer',
+                                'type' => 'integer',
                             ],
                             'description' => [
-                                'title'       => 'Description',
+                                'title' => 'Description',
                                 'description' => 'The description of the series',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     ['type' => 'null'],
                                     ['type' => 'string'],
                                 ],
                             ],
                             'creator' => [
-                                'title'       => 'Creator',
+                                'title' => 'Creator',
                                 'description' => 'The creator or showrunner of the series',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     ['type' => 'null'],
                                     ['type' => 'string'],
                                 ],
                             ],
                             'status' => [
-                                'title'       => 'Series Status',
+                                'title' => 'Series Status',
                                 'description' => 'The current status of the series',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     [
                                         'type' => 'string',
                                         'enum' => [
@@ -248,27 +255,27 @@ final class GeneratorTest extends TestCase
                                 ],
                             ],
                             'firstAirDate' => [
-                                'title'       => 'First Air Date',
+                                'title' => 'First Air Date',
                                 'description' => 'The original release date of the series',
-                                'format'      => 'date',
-                                'oneOf'       => [
+                                'format' => 'date',
+                                'oneOf' => [
                                     ['type' => 'null'],
                                     ['type' => 'string'],
                                 ],
                             ],
                             'lastAirDate' => [
-                                'title'       => 'Last Air Date',
+                                'title' => 'Last Air Date',
                                 'description' => 'The most recent air date of the series',
-                                'format'      => 'date',
-                                'oneOf'       => [
+                                'format' => 'date',
+                                'oneOf' => [
                                     ['type' => 'null'],
                                     ['type' => 'string'],
                                 ],
                             ],
                             'seasons' => [
-                                'title'       => 'Seasons',
+                                'title' => 'Seasons',
                                 'description' => 'Number of seasons released',
-                                'oneOf'       => [
+                                'oneOf' => [
                                     ['type' => 'integer'],
                                     ['type' => 'null'],
                                 ],
