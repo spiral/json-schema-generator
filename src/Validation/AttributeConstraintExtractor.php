@@ -13,10 +13,7 @@ use Spiral\JsonSchemaGenerator\Attribute\Constraint\Range;
 use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 
-/**
- * @internal
- */
-final readonly class AttributeConstraintExtractor
+final readonly class AttributeConstraintExtractor implements PropertyDataExtractorInterface
 {
     public function extractValidationRules(PropertyInterface $property, Type $jsonSchemaType): array
     {
@@ -84,7 +81,6 @@ final readonly class AttributeConstraintExtractor
     private function getLengthMinKey(Type $jsonSchemaType): string
     {
         return match ($jsonSchemaType) {
-            Type::String => 'minLength',
             Type::Array => 'minItems',
             default => 'minLength', // fallback
         };
@@ -93,7 +89,6 @@ final readonly class AttributeConstraintExtractor
     private function getLengthMaxKey(Type $jsonSchemaType): string
     {
         return match ($jsonSchemaType) {
-            Type::String => 'maxLength',
             Type::Array => 'maxItems',
             default => 'maxLength', // fallback
         };

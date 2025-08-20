@@ -7,10 +7,7 @@ namespace Spiral\JsonSchemaGenerator\Validation;
 use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 
-/**
- * @internal
- */
-final readonly class ValidationConstraintExtractor
+final readonly class ValidationConstraintExtractor implements PropertyDataExtractorInterface
 {
     public function __construct(
         private DocBlockParser $docBlockParser = new DocBlockParser(),
