@@ -9,13 +9,13 @@ use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 /**
  * @internal
  */
-final class Type
+final readonly class Type
 {
     /**
      * @param list<SimpleType> $types
      */
     public function __construct(
-        public readonly array $types,
+        public array $types,
     ) {}
 
     public function allowsNull(): bool

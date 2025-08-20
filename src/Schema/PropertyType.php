@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Schema;
 
-final class PropertyType
+final readonly class PropertyType
 {
     /**
      * @param class-string|Type $type
@@ -12,8 +12,8 @@ final class PropertyType
      * @param list<PropertyType>|null $collectionTypes
      */
     public function __construct(
-        public readonly string|Type $type,
-        public readonly ?array $enum = null,
-        public readonly ?array $collectionTypes = null,
+        public string|Type $type,
+        public ?array $enum = null,
+        public ?array $collectionTypes = null,
     ) {}
 }

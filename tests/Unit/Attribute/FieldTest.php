@@ -43,7 +43,7 @@ final class FieldTest extends TestCase
         $ref = new \ReflectionProperty(self::class, 'withValues');
 
         $attr = $ref->getAttributes(Field::class)[0]->newInstance();
-        $this->assertInstanceOf('Spiral\JsonSchemaGenerator\Schema\Format', $attr->format);
+        $this->assertInstanceOf(\Spiral\JsonSchemaGenerator\Schema\Format::class, $attr->format);
         $this->assertSame('email', $attr->format->value);
     }
 }

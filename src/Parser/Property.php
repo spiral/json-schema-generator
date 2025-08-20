@@ -7,13 +7,13 @@ namespace Spiral\JsonSchemaGenerator\Parser;
 /**
  * @internal
  */
-final class Property implements PropertyInterface
+final readonly class Property implements PropertyInterface
 {
     public function __construct(
-        private readonly \ReflectionProperty $property,
-        private readonly Type $type,
-        private readonly bool $hasDefaultValue,
-        private readonly mixed $defaultValue = null,
+        private \ReflectionProperty $property,
+        private Type $type,
+        private bool $hasDefaultValue,
+        private mixed $defaultValue = null,
     ) {}
 
     /**

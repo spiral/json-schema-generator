@@ -9,13 +9,13 @@ use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
 /**
  * @internal
  */
-final class PropertyOption
+final readonly class PropertyOption
 {
     /**
      * @param Type|class-string $value
      */
     public function __construct(
-        public readonly Type|string $value,
+        public Type|string $value,
     ) {
         if (\is_string($this->value) && !\class_exists($this->value)) {
             throw new InvalidTypeException('Invalid property option definition.');

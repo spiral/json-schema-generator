@@ -6,14 +6,14 @@ namespace Spiral\JsonSchemaGenerator\Tests\Unit\Fixture;
 
 use Spiral\JsonSchemaGenerator\Attribute\Field;
 
-final class FlexibleValue
+final readonly class FlexibleValue
 {
     public function __construct(
         #[Field(title: 'Value', description: 'Can be either string or integer')]
-        public readonly string|int $value,
+        public string|int $value,
         #[Field(title: 'Optional Flag', description: 'Boolean or null')]
-        public readonly bool|null $flag = null,
+        public bool|null $flag = null,
         #[Field(title: 'Flexible Field', description: 'Can be string, int, or null')]
-        public readonly string|int|null $flex = null,
+        public string|int|null $flex = null,
     ) {}
 }

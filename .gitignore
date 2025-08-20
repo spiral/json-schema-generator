@@ -10,3 +10,6 @@ docs
 vendor
 node_modules
 .php-cs-fixer.cache
+.context
+mcp-*.log
+runtime

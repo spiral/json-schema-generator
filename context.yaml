@@ -1,0 +1,25 @@
+$schema: 'https://raw.githubusercontent.com/context-hub/generator/refs/heads/main/json-schema.json'
+
+tools:
+  - id: run-tests
+    description: 'Run tests'
+    type: run
+    commands:
+      - cmd: vendor/bin/phpunit
+
+documents:
+  - description: 'Project structure overview'
+    outputPath: project-structure.md
+    sources:
+      - type: tree
+        sourcePaths:
+          - src
+        showCharCount: true
+
+  - description: Source code
+    outputPath: source-code.md
+    sources:
+      - type: file
+        sourcePaths:
+          - src
+          - tests/Unit

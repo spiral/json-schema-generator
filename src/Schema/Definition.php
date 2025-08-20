@@ -24,7 +24,7 @@ final class Definition extends AbstractDefinition
                 throw new DefinitionException(\sprintf(
                     'Property `%s` is not an instance of `%s`.',
                     // type name or class name
-                    \is_object($property) ? \get_class($property) : \gettype($property),
+                    \get_debug_type($property),
                     Property::class,
                 ));
             }

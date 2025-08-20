@@ -9,7 +9,7 @@ use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 /**
  * @internal
  */
-final class SimpleType implements TypeInterface
+final readonly class SimpleType implements TypeInterface
 {
     /**
      * @var class-string|SchemaType
@@ -22,9 +22,9 @@ final class SimpleType implements TypeInterface
      */
     public function __construct(
         string $name,
-        private readonly bool $builtin,
-        private readonly ?Type $collectionType = null,
-        private readonly ?array $enum = null,
+        private bool $builtin,
+        private ?Type $collectionType = null,
+        private ?array $enum = null,
     ) {
         /** @psalm-suppress PropertyTypeCoercion */
         $this->name = $this->builtin ? SchemaType::fromBuiltIn($name) : $name;

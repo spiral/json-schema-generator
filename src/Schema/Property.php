@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Schema;
 
-final class Property implements \JsonSerializable
+final readonly class Property implements \JsonSerializable
 {
     /**
      * @param list<PropertyType> $types
      */
     public function __construct(
-        public readonly array $types,
-        public readonly string $title = '',
-        public readonly string $description = '',
-        public readonly bool $required = false,
-        public readonly mixed $default = null,
-        public readonly ?Format $format = null,
+        public array $types,
+        public string $title = '',
+        public string $description = '',
+        public bool $required = false,
+        public mixed $default = null,
+        public ?Format $format = null,
     ) {}
 
     public function jsonSerialize(): array

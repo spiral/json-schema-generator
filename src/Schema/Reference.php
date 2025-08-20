@@ -7,13 +7,13 @@ namespace Spiral\JsonSchemaGenerator\Schema;
 /**
  * @internal
  */
-final class Reference implements \JsonSerializable
+final readonly class Reference implements \JsonSerializable
 {
     /**
      * @param class-string $className
      */
     public function __construct(
-        private readonly string $className,
+        private string $className,
     ) {}
 
     public function jsonSerialize(): string
