@@ -18,7 +18,7 @@ final class Schema extends AbstractDefinition
 
     public function jsonSerialize(): array
     {
-        $schema = $this->renderProperties([]);
+        $schema = $this->renderProperties(['type' => 'object']);
 
         if ($this->definitions !== []) {
             $schema['definitions'] = [];

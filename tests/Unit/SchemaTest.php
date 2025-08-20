@@ -6,6 +6,7 @@ namespace Spiral\JsonSchemaGenerator\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Schema;
+use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
 
 final class SchemaTest extends TestCase
@@ -14,7 +15,7 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
 
-        $this->assertSame([], $schema->jsonSerialize());
+        $this->assertSame(['type' => 'object'], $schema->jsonSerialize());
     }
 
     public function testStringProperty(): void
@@ -23,7 +24,7 @@ final class SchemaTest extends TestCase
         $schema->addProperty(
             'name',
             new Schema\Property(
-                type: Schema\Type::String,
+                types: [new PropertyType(type: Schema\Type::String)],
                 title: 'Name',
                 description: 'Name of the user',
                 required: true,
@@ -32,6 +33,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'name' => [
                         'title' => 'Name',
@@ -51,9 +53,9 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
         $schema->addProperty(
-            'name',
-            new Schema\Property(
-                type: Schema\Type::String,
+            name: 'name',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::String)],
                 title: 'Name',
                 description: 'Name of the user',
                 required: true,
@@ -61,9 +63,9 @@ final class SchemaTest extends TestCase
         );
 
         $schema->addProperty(
-            'age',
-            new Schema\Property(
-                type: Schema\Type::Integer,
+            name: 'age',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Integer)],
                 title: 'Age',
                 description: 'Age of the user',
                 required: true,
@@ -71,9 +73,9 @@ final class SchemaTest extends TestCase
         );
 
         $schema->addProperty(
-            'height',
-            new Schema\Property(
-                type: Schema\Type::Number,
+            name: 'height',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Number)],
                 title: 'Height',
                 description: 'Height of the user',
                 required: true,
@@ -81,9 +83,9 @@ final class SchemaTest extends TestCase
         );
 
         $schema->addProperty(
-            'is_active',
-            new Schema\Property(
-                type: Schema\Type::Boolean,
+            name: 'is_active',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Boolean)],
                 title: 'Is Active',
                 description: 'Is the user active',
                 required: false,
@@ -92,6 +94,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'name'      => [
                         'title'       => 'Name',
@@ -128,10 +131,9 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
         $schema->addProperty(
-            'hobbies',
-            new Schema\Property(
-                type: Schema\Type::Array,
-                options: [Schema\Type::String],
+            name: 'hobbies',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Array, collectionTypes: [new PropertyType(type: Schema\Type::String)])],
                 title: 'Hobbies',
                 description: 'Hobbies of the user',
                 required: true,
@@ -140,6 +142,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'hobbies' => [
                         'type'        => 'array',
@@ -162,10 +165,9 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
         $schema->addProperty(
-            'hobbies',
-            new Schema\Property(
-                type: Schema\Type::Array,
-                options: [Schema\Type::String, Schema\Type::Number],
+            name: 'hobbies',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Array, collectionTypes: [new PropertyType(type: Schema\Type::String), new PropertyType(type: Schema\Type::Number)])],
                 title: 'Hobbies',
                 description: 'Hobbies of the user',
                 required: true,
@@ -174,6 +176,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'hobbies' => [
                         'type'        => 'array',
@@ -195,48 +198,13 @@ final class SchemaTest extends TestCase
         );
     }
 
-    public function testMixedProperty(): void
-    {
-        $schema = new Schema();
-        $schema->addProperty(
-            'hobbies',
-            new Schema\Property(
-                type: Schema\Type::Union,
-                options: [Schema\Type::String, Schema\Type::Number, Schema\Type::Boolean],
-                title: 'Some value',
-                description: 'Some random user value',
-                required: true,
-            ),
-        );
-
-        $this->assertEquals(
-            [
-                'properties' => [
-                    'hobbies' => [
-                        'title'       => 'Some value',
-                        'description' => 'Some random user value',
-                        'anyOf'       => [
-                            ['type' => 'string'],
-                            ['type' => 'number'],
-                            ['type' => 'boolean'],
-                        ],
-                    ],
-                ],
-                'required'   => [
-                    'hobbies',
-                ],
-            ],
-            $schema->jsonSerialize(),
-        );
-    }
-
     public function testClassProperty(): void
     {
         $schema = new Schema();
         $schema->addProperty(
-            'movie',
-            new Schema\Property(
-                type: Movie::class,
+            name: 'movie',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Movie::class)],
                 title: 'Some movie',
                 required: false,
             ),
@@ -244,14 +212,11 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'movie' => [
                         'title' => 'Some movie',
-                        'allOf' => [
-                            [
-                                '$ref' => '#/definitions/Movie',
-                            ],
-                        ],
+                        '$ref' => '#/definitions/Movie',
                     ],
                 ],
             ],
@@ -263,10 +228,9 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
         $schema->addProperty(
-            'movie',
-            new Schema\Property(
-                type: Schema\Type::Array,
-                options: [Movie::class],
+            name: 'movie',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Array, collectionTypes: [new PropertyType(type: Movie::class)])],
                 title: 'Some movie',
                 required: false,
             ),
@@ -274,6 +238,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'movie' => [
                         'title' => 'Some movie',
@@ -292,10 +257,9 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
         $schema->addProperty(
-            'movie',
-            new Schema\Property(
-                type: Schema\Type::Array,
-                options: [Movie::class, Schema\Type::String],
+            name: 'movie',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Array, collectionTypes: [new PropertyType(type: Movie::class), new PropertyType(type: Schema\Type::String)])],
                 title: 'Some movie',
                 required: false,
             ),
@@ -303,6 +267,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties' => [
                     'movie' => [
                         'title' => 'Some movie',
@@ -328,10 +293,9 @@ final class SchemaTest extends TestCase
     {
         $schema = new Schema();
         $schema->addProperty(
-            'movie',
-            new Schema\Property(
-                type: Schema\Type::Array,
-                options: [Movie::class, Schema\Type::String],
+            name: 'movie',
+            property: new Schema\Property(
+                types: [new PropertyType(type: Schema\Type::Array, collectionTypes: [new PropertyType(type: Movie::class), new PropertyType(type: Schema\Type::String)])],
                 title: 'Some movie',
                 required: false,
             ),
@@ -341,7 +305,7 @@ final class SchemaTest extends TestCase
             type: Movie::class,
             properties: [
                 'title' => new Schema\Property(
-                    type: Schema\Type::String,
+                    types: [new PropertyType(type: Schema\Type::String)],
                     title: 'Title',
                     description: 'Title of the movie',
                     required: true,
@@ -353,6 +317,7 @@ final class SchemaTest extends TestCase
 
         $this->assertEquals(
             [
+                'type' => 'object',
                 'properties'  => [
                     'movie' => [
                         'title' => 'Some movie',

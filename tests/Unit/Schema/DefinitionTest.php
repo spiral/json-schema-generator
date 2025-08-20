@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Exception\DefinitionException;
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
+use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\InvalidEnum;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
@@ -21,13 +22,13 @@ final class DefinitionTest extends TestCase
             type: Movie::class,
             properties: [
                 'title' => new Property(
-                    type: Type::String,
+                    types: [new PropertyType(type: Type::String)],
                     title: 'Title',
                     description: 'Title of the movie',
                     required: true,
                 ),
                 'status' => new Property(
-                    type: ReleaseStatus::class,
+                    types: [new PropertyType(type: Type::Null), new PropertyType(type: Type::String, enum: ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'])],
                     title: 'Status',
                     description: 'Status of the movie',
                     required: true,
@@ -39,16 +40,18 @@ final class DefinitionTest extends TestCase
             'type' => 'object',
             'properties' => [
                 'title' => [
-                    'title' => 'Title',
+                    'title'       => 'Title',
                     'description' => 'Title of the movie',
-                    'type' => 'string',
+                    'type'        => 'string',
                 ],
                 'status' => [
-                    'title' => 'Status',
+                    'title'       => 'Status',
                     'description' => 'Status of the movie',
-                    'allOf' => [
+                    'oneOf'       => [
+                        ['type' => 'null'],
                         [
-                            '$ref' => '#/definitions/ReleaseStatus',
+                            'type' => 'string',
+                            'enum' => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                         ],
                     ],
                 ],

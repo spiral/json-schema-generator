@@ -63,7 +63,7 @@ final class Definition extends AbstractDefinition
         $rf = new \ReflectionClass($this->type);
         if (!$rf->isEnum()) {
             throw new DefinitionException(\sprintf(
-                'Type `%s` must be a backed enum or class with properties.',
+                'SimpleType `%s` must be a backed enum or class with properties.',
                 $this->type instanceof Type ? $this->type->value : $this->type,
             ));
         }
@@ -73,7 +73,7 @@ final class Definition extends AbstractDefinition
         /** @var \ReflectionEnum $rf */
         if (!$rf->isBacked()) {
             throw new DefinitionException(\sprintf(
-                'Type `%s` is not a backed enum.',
+                'SimpleType `%s` is not a backed enum.',
                 $this->type instanceof Type ? $this->type->value : $this->type,
             ));
         }
@@ -89,7 +89,7 @@ final class Definition extends AbstractDefinition
             'string' => 'string',
             'bool' => 'boolean',
             default => throw new DefinitionException(\sprintf(
-                'Type `%s` is not a backed enum.',
+                'SimpleType `%s` is not a backed enum.',
                 $this->type instanceof Type ? $this->type->value : $this->type,
             )),
         };
