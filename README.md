@@ -793,18 +793,16 @@ final class ContactInfo
 
 ## Configuration Options
 
-You can configure the generator behavior using the `GeneratorConfig` class and custom property data extractors:
-
 ```php
 use Spiral\JsonSchemaGenerator\Generator;
-use Spiral\JsonSchemaGenerator\GeneratorConfig;
 use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\PhpDocValidationConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
 
-// Basic configuration - enable/disable validation constraints
-$config = new GeneratorConfig(enableValidationConstraints: true);
-$generator = new Generator(config: $config);
+// Use default extractors (recommended for most cases)
+$generator = new Generator(
+    propertyDataExtractor: CompositePropertyDataExtractor::createDefault(),
+);
 
 // Advanced configuration - custom property data extractors
 $compositeExtractor = new CompositePropertyDataExtractor([
@@ -812,15 +810,15 @@ $compositeExtractor = new CompositePropertyDataExtractor([
     new AttributeConstraintExtractor(),
 ]);
 
-$generator = new Generator(propertyDataExtractor: $compositeExtractor);
-
-// Use default extractors (recommended for most cases)
-$generator = new Generator(propertyDataExtractor: CompositePropertyDataExtractor::createDefault());
+$generator = new Generator(
+    ropertyDataExtractor: $compositeExtractor,
+);
 ```
 
 #### Property Data Extractors
 
-The generator uses a modular property data extractor system that allows you to customize how validation constraints are extracted from properties:
+The generator uses a modular property data extractor system that allows you to customize how validation constraints are
+extracted from properties:
 
 **Available Extractors:**
 
@@ -875,7 +873,13 @@ $generator = new Generator(
     propertyDataExtractor: CompositePropertyDataExtractor::createDefault()
         ->withExtractor(new CustomConstraintExtractor())
 );
+```
 
+## Integration with Valinor
+
+The JSON Schema Generator works perfectly with the [Valinor PHP package](https://github.com/CuyZ/Valinor) for complete
+data mapping and validation workflows. Valinor can validate incoming data based on the same PHPDoc constraints that the
+generator uses to create JSON schemas.
 
 ### Installation
 
@@ -897,12 +901,12 @@ declare(strict_types=1);
 namespace App;
 
 use CuyZ\Valinor\Mapper\TreeMapper;
-use Spiral\JsonSchemaGenerator\Generator as JsonSchemaGenerator;
+use Spiral\JsonSchemaGenerator\Generator;
 
 final readonly class SchemaMapper
 {
     public function __construct(
-        private JsonSchemaGenerator $generator,
+        private Generator $generator,
         private TreeMapper $mapper,
     ) {}
 
@@ -1029,33 +1033,6 @@ public function createUser(ServerRequestInterface $request): ResponseInterface
         ], 400);
     }
 }
-```
-
-### Advanced Configuration
-
-You can configure both packages to work optimally together:
-
-```php
-use CuyZ\Valinor\MapperBuilder;
-use Spiral\JsonSchemaGenerator\Generator;
-use Spiral\JsonSchemaGenerator\GeneratorConfig;
-
-// Configure the JSON Schema Generator
-$generatorConfig = new GeneratorConfig(
-    enableValidationConstraints: true // Enable PHPDoc constraint extraction
-);
-
-// Configure Valinor mapper with flexible options
-$treeMapper = (new MapperBuilder())
-    ->enableFlexibleCasting()           // Allow flexible type casting
-    ->allowPermissiveTypes()            // Allow permissive type handling
-    ->allowSuperfluousKeys()            // Ignore extra keys in input
-    ->build();
-
-$mapper = new SchemaMapper(
-    generator: new Generator(config: $generatorConfig),
-    mapper: $treeMapper
-);
 ```
 
 ### Error Handling
