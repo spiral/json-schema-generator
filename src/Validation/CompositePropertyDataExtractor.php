@@ -22,7 +22,7 @@ final readonly class CompositePropertyDataExtractor implements PropertyDataExtra
     public static function createDefault(): self
     {
         return new self([
-            new ValidationConstraintExtractor(),
+            new PhpDocValidationConstraintExtractor(),
             new AttributeConstraintExtractor(),
         ]);
     }

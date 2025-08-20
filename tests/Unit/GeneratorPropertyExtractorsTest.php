@@ -10,7 +10,7 @@ use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\UserWithConstraints;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ValidatedUser;
 use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
-use Spiral\JsonSchemaGenerator\Validation\ValidationConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\PhpDocValidationConstraintExtractor;
 
 final class GeneratorPropertyExtractorsTest extends TestCase
 {
@@ -34,7 +34,7 @@ final class GeneratorPropertyExtractorsTest extends TestCase
     public function testCreateWithValidationOnly(): void
     {
         $generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([
-            new ValidationConstraintExtractor(),
+            new PhpDocValidationConstraintExtractor(),
         ]));
         $schema = $generator->generate(ValidatedUser::class);
         $result = $schema->jsonSerialize();

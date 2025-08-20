@@ -793,33 +793,89 @@ final class ContactInfo
 
 ## Configuration Options
 
-You can configure the generator behavior using the `GeneratorConfig` class:
+You can configure the generator behavior using the `GeneratorConfig` class and custom property data extractors:
 
 ```php
 use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\GeneratorConfig;
+use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\PhpDocValidationConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
 
-// Enable validation constraints (default: true)
+// Basic configuration - enable/disable validation constraints
 $config = new GeneratorConfig(enableValidationConstraints: true);
 $generator = new Generator(config: $config);
 
-// Disable validation constraints for performance
-$config = new GeneratorConfig(enableValidationConstraints: false); 
-$generator = new Generator(config: $config);
+// Advanced configuration - custom property data extractors
+$compositeExtractor = new CompositePropertyDataExtractor([
+    new PhpDocValidationConstraintExtractor(),
+    new AttributeConstraintExtractor(),
+]);
+
+$generator = new Generator(propertyDataExtractor: $compositeExtractor);
+
+// Use default extractors (recommended for most cases)
+$generator = new Generator(propertyDataExtractor: CompositePropertyDataExtractor::createDefault());
 ```
 
-### Configuration Options
+#### Property Data Extractors
 
-- `enableValidationConstraints` (bool, default: true) - Enable/disable PHPDoc validation constraint extraction
+The generator uses a modular property data extractor system that allows you to customize how validation constraints are extracted from properties:
 
-When `enableValidationConstraints` is disabled, the generator will skip parsing PHPDoc comments for validation rules,
-which can improve performance for large schemas where validation constraints are not needed.
+**Available Extractors:**
 
-## Integration with Valinor
+- `PhpDocValidationConstraintExtractor` - Extracts constraints from PHPDoc comments
+- `AttributeConstraintExtractor` - Extracts constraints from PHP attributes
+- `CompositePropertyDataExtractor` - Combines multiple extractors
 
-The JSON Schema Generator works perfectly with the [Valinor PHP package](https://github.com/CuyZ/Valinor) for complete
-data mapping and validation workflows. Valinor can validate incoming data based on the same PHPDoc constraints that the
-generator uses to create JSON schemas.
+**Usage Examples:**
+
+```php
+// Use only PHPDoc constraints
+$generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([
+    new PhpDocValidationConstraintExtractor(),
+]));
+
+// Use only attribute constraints
+$generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([
+    new AttributeConstraintExtractor(),
+]));
+
+// Use both (default behavior)
+$generator = new Generator(propertyDataExtractor: CompositePropertyDataExtractor::createDefault());
+
+// Disable all validation constraints for performance
+$generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([]));
+```
+
+### Custom Property Data Extractors
+
+You can create custom property data extractors by implementing the `PropertyDataExtractorInterface`:
+
+```php
+use Spiral\JsonSchemaGenerator\Validation\PropertyDataExtractorInterface;
+use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
+use Spiral\JsonSchemaGenerator\Schema\Type;
+
+class CustomConstraintExtractor implements PropertyDataExtractorInterface
+{
+    public function extractValidationRules(PropertyInterface $property, Type $jsonSchemaType): array
+    {
+        $rules = [];
+        
+        // Your custom constraint extraction logic here
+        // For example, extract constraints from custom attributes or naming conventions
+        
+        return $rules;
+    }
+}
+
+// Use your custom extractor
+$generator = new Generator(
+    propertyDataExtractor: CompositePropertyDataExtractor::createDefault()
+        ->withExtractor(new CustomConstraintExtractor())
+);
+
 
 ### Installation
 
