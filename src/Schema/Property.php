@@ -8,6 +8,7 @@ final readonly class Property implements \JsonSerializable
 {
     /**
      * @param list<PropertyType> $types
+     * @param array<string, mixed> $validationRules
      */
     public function __construct(
         public array $types,
@@ -16,6 +17,7 @@ final readonly class Property implements \JsonSerializable
         public bool $required = false,
         public mixed $default = null,
         public ?Format $format = null,
+        public array $validationRules = [], // NEW: Validation rules from PHPDoc
     ) {}
 
     public function jsonSerialize(): array
@@ -37,6 +39,13 @@ final readonly class Property implements \JsonSerializable
             $property['format'] = $this->format->value;
         }
 
+        // Check if we have an array shape constraint that should override the type
+        if (isset($this->validationRules['type']) && $this->validationRules['type'] === 'object') {
+            // Array shape overrides normal type processing
+            $property = \array_merge($property, $this->validationRules);
+            return $property;
+        }
+
         $typesCount = \count($this->types);
         if ($typesCount > 1) {
             foreach ($this->types as $type) {
@@ -45,6 +54,13 @@ final readonly class Property implements \JsonSerializable
         } elseif ($typesCount === 1) {
             $property = \array_merge($property, $this->propertyTypeToDefinition($this->types[0]));
         }
+
+        // Apply validation rules from PHPDoc constraints (except type overrides)
+        $filteredValidationRules = $this->validationRules;
+        if (isset($filteredValidationRules['type'])) {
+            unset($filteredValidationRules['type'], $filteredValidationRules['properties'], $filteredValidationRules['required'], $filteredValidationRules['additionalProperties']);
+        }
+        $property = \array_merge($property, $filteredValidationRules);
 
         return $property;
     }

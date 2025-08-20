@@ -14,6 +14,7 @@ use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
 use Spiral\JsonSchemaGenerator\Schema\PropertyType;
+use Spiral\JsonSchemaGenerator\Validation\ValidationConstraintExtractor;
 
 class Generator implements GeneratorInterface
 {
@@ -21,6 +22,7 @@ class Generator implements GeneratorInterface
 
     public function __construct(
         protected readonly ParserInterface $parser = new Parser(),
+        protected readonly ValidationConstraintExtractor $validationExtractor = new ValidationConstraintExtractor(),
     ) {}
 
     /**
@@ -120,14 +122,19 @@ class Generator implements GeneratorInterface
         }
 
         $type = $property->getType();
+        $propertyTypes = $this->extractPropertyTypes($type);
+
+        // NEW: Extract validation constraints from PHPDoc
+        $validationRules = $this->extractValidationConstraints($property, $propertyTypes);
 
         return new Property(
-            types: $this->extractPropertyTypes($type),
+            types: $propertyTypes,
             title: $title,
             description: $description,
             required: $default === null && !$type->allowsNull(),
             default: $default,
             format: $format,
+            validationRules: $validationRules, // NEW: Add validation rules
         );
     }
 
@@ -139,10 +146,30 @@ class Generator implements GeneratorInterface
         return \array_map(static fn(SimpleType $simpleType) => new PropertyType(
             type: $simpleType->getName(),
             enum: $simpleType->getEnumValues(),
-            collectionTypes: $simpleType->isCollection() ? \array_map(static fn(SimpleType $collectionSimpleType) => new PropertyType(
-                type: $collectionSimpleType->getName(),
-                enum: $collectionSimpleType->getEnumValues(),
-            ), $simpleType->getCollectionType()?->types ?? []) : null,
+            collectionTypes: $simpleType->isCollection() ? \array_map(
+                static fn(SimpleType $collectionSimpleType) => new PropertyType(
+                    type: $collectionSimpleType->getName(),
+                    enum: $collectionSimpleType->getEnumValues(),
+                ),
+                $simpleType->getCollectionType()?->types ?? [],
+            ) : null,
         ), $type->types);
+    }
+
+    /**
+     * Extract validation constraints from property PHPDoc
+     */
+    private function extractValidationConstraints(PropertyInterface $property, array $propertyTypes): array
+    {
+        $allValidationRules = [];
+
+        foreach ($propertyTypes as $propertyType) {
+            if ($propertyType->type instanceof Schema\Type) {
+                $validationRules = $this->validationExtractor->extractValidationRules($property, $propertyType->type);
+                $allValidationRules = \array_merge($allValidationRules, $validationRules);
+            }
+        }
+
+        return $allValidationRules;
     }
 }
