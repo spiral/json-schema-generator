@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\JsonSchemaGenerator\Attribute\Constraint;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-readonly class Range
+final readonly class Range
 {
     public function __construct(
         public int|float|null $min = null,
