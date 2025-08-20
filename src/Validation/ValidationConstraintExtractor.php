@@ -7,6 +7,9 @@ namespace Spiral\JsonSchemaGenerator\Validation;
 use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 
+/**
+ * @internal
+ */
 final readonly class ValidationConstraintExtractor
 {
     public function __construct(

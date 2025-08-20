@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Schema;
 
+/**
+ * @internal
+ */
 final readonly class Property implements \JsonSerializable
 {
     /**

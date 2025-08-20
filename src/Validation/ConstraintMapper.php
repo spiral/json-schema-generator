@@ -10,6 +10,9 @@ use Spiral\JsonSchemaGenerator\Validation\Constraint\ArrayConstraint;
 use Spiral\JsonSchemaGenerator\Validation\Constraint\NumericConstraint;
 use Spiral\JsonSchemaGenerator\Validation\Constraint\StringConstraint;
 
+/**
+ * @internal
+ */
 final class ConstraintMapper
 {
     public function mapConstraintsToJsonSchema(array $constraints, Type $jsonSchemaType): array

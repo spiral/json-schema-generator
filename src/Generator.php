@@ -16,7 +16,7 @@ use Spiral\JsonSchemaGenerator\Schema\Property;
 use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Validation\ValidationConstraintExtractor;
 
-class Generator implements GeneratorInterface
+final class Generator implements GeneratorInterface
 {
     protected array $cache = [];
     private readonly ValidationConstraintExtractor $validationExtractor;

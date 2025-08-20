@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Validation\Constraint;
 
+/**
+ * @internal
+ */
 abstract class AbstractConstraint
 {
     public function __construct(

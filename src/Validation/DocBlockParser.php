@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Validation;
 
+/**
+ * @internal
+ */
 final class DocBlockParser
 {
     private const string VAR_PATTERN = '/@var\s+([^*\n\r]+)/';
