@@ -447,6 +447,184 @@ The generated schema will include a `oneOf` section to reflect the union types:
 > All supported types are automatically resolved from native PHP type declarations and reflected in the JSON Schema
 > output using oneOf.
 
+## Constraint Attributes
+
+Generator supports dedicated constraint attributes that provide a clean, modular approach to validation rules.
+
+### Available Constraint Attributes
+
+#### String Constraints
+
+- `#[Pattern(regex)]` - Regular expression pattern validation
+- `#[Length(min, max)]` - String length constraints
+
+#### Numeric Constraints
+
+- `#[Range(min, max, exclusiveMin, exclusiveMax)]` - Numeric range validation with optional exclusive bounds
+- `#[MultipleOf(value)]` - Multiple of validation for numbers
+
+#### Array Constraints
+
+- `#[Items(min, max, unique)]` - Array item constraints with optional uniqueness
+- `#[Length(min, max)]` - Array length constraints (same attribute as strings, auto-detects type)
+
+#### General Constraints
+
+- `#[Enum(values)]` - Enumeration validation with array of allowed values
+
+### Usage Examples
+
+#### String Validation
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\Pattern;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\Length;
+
+final readonly class User
+{
+    public function __construct(
+        #[Field(title: 'Full Name', description: 'User full name in Title Case')]
+        #[Pattern('^[A-Z][a-z]+(?: [A-Z][a-z]+)*$')]
+        #[Length(min: 2, max: 100)]
+        public string $name,
+
+        #[Field(title: 'Username')]
+        #[Pattern('^[a-zA-Z0-9_]{3,20}$')]
+        #[Length(min: 3, max: 20)]
+        public string $username,
+
+        #[Field(title: 'Email', format: Format::Email)]
+        #[Pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]
+        public string $email,
+    ) {}
+}
+```
+
+#### Numeric Validation
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\Range;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\MultipleOf;
+
+final readonly class Product
+{
+    public function __construct(
+        #[Field(title: 'Price', description: 'Product price in USD')]
+        #[Range(min: 0.01, max: 99999.99)]
+        #[MultipleOf(0.01)]
+        public float $price,
+
+        #[Field(title: 'Stock Quantity')]
+        #[Range(min: 0, max: 10000)]
+        public int $stock,
+
+        #[Field(title: 'Discount Percentage')]
+        #[Range(min: 0, max: 100, exclusiveMax: true)]
+        public float $discountPercent,
+    ) {}
+}
+```
+
+#### Array and Enum Validation
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\Items;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\Length;
+use Spiral\JsonSchemaGenerator\Attribute\Constraint\Enum;
+
+final readonly class BlogPost
+{
+    public function __construct(
+        #[Field(title: 'Tags', description: 'Post tags')]
+        #[Items(min: 1, max: 10, unique: true)]
+        public array $tags,
+
+        #[Field(title: 'Categories', description: 'Post categories')]
+        #[Length(min: 1, max: 5)]
+        public array $categories,
+
+        #[Field(title: 'Status')]
+        #[Enum(['draft', 'published', 'archived', 'pending'])]
+        public string $status,
+
+        #[Field(title: 'Priority')]
+        #[Enum([1, 2, 3, 4, 5])]
+        public int $priority,
+    ) {}
+}
+```
+
+### Generated Schema Output
+
+The constraint attributes generate clean, standards-compliant JSON Schema validation rules:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "title": "Full Name",
+      "description": "User full name in Title Case",
+      "type": "string",
+      "pattern": "^[A-Z][a-z]+(?: [A-Z][a-z]+)*$",
+      "minLength": 2,
+      "maxLength": 100
+    },
+    "price": {
+      "title": "Price",
+      "description": "Product price in USD",
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 99999.99,
+      "multipleOf": 0.01
+    },
+    "tags": {
+      "title": "Tags",
+      "description": "Post tags",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "status": {
+      "title": "Status",
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived",
+        "pending"
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "price",
+    "tags",
+    "status"
+  ]
+}
+```
+
+### Type Safety
+
+Constraint attributes are automatically validated for type compatibility:
+
+- `Pattern` only applies to string properties
+- `Range` and `MultipleOf` only apply to numeric properties (int, float)
+- `Items` constraints only apply to array properties
+- `Length` adapts behavior: `minLength`/`maxLength` for strings, `minItems`/`maxItems` for arrays
+- `Enum` works with any property type
+
 ## PHPDoc Validation Constraints
 
 Generator supports extracting validation constraints from PHPDoc comments, providing rich validation
@@ -615,33 +793,89 @@ final class ContactInfo
 
 ## Configuration Options
 
-You can configure the generator behavior using the `GeneratorConfig` class:
+You can configure the generator behavior using the `GeneratorConfig` class and custom property data extractors:
 
 ```php
 use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\GeneratorConfig;
+use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\PhpDocValidationConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
 
-// Enable validation constraints (default: true)
+// Basic configuration - enable/disable validation constraints
 $config = new GeneratorConfig(enableValidationConstraints: true);
 $generator = new Generator(config: $config);
 
-// Disable validation constraints for performance
-$config = new GeneratorConfig(enableValidationConstraints: false); 
-$generator = new Generator(config: $config);
+// Advanced configuration - custom property data extractors
+$compositeExtractor = new CompositePropertyDataExtractor([
+    new PhpDocValidationConstraintExtractor(),
+    new AttributeConstraintExtractor(),
+]);
+
+$generator = new Generator(propertyDataExtractor: $compositeExtractor);
+
+// Use default extractors (recommended for most cases)
+$generator = new Generator(propertyDataExtractor: CompositePropertyDataExtractor::createDefault());
 ```
 
-### Configuration Options
+#### Property Data Extractors
 
-- `enableValidationConstraints` (bool, default: true) - Enable/disable PHPDoc validation constraint extraction
+The generator uses a modular property data extractor system that allows you to customize how validation constraints are extracted from properties:
 
-When `enableValidationConstraints` is disabled, the generator will skip parsing PHPDoc comments for validation rules,
-which can improve performance for large schemas where validation constraints are not needed.
+**Available Extractors:**
 
-## Integration with Valinor
+- `PhpDocValidationConstraintExtractor` - Extracts constraints from PHPDoc comments
+- `AttributeConstraintExtractor` - Extracts constraints from PHP attributes
+- `CompositePropertyDataExtractor` - Combines multiple extractors
 
-The JSON Schema Generator works perfectly with the [Valinor PHP package](https://github.com/CuyZ/Valinor) for complete
-data mapping and validation workflows. Valinor can validate incoming data based on the same PHPDoc constraints that the
-generator uses to create JSON schemas.
+**Usage Examples:**
+
+```php
+// Use only PHPDoc constraints
+$generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([
+    new PhpDocValidationConstraintExtractor(),
+]));
+
+// Use only attribute constraints
+$generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([
+    new AttributeConstraintExtractor(),
+]));
+
+// Use both (default behavior)
+$generator = new Generator(propertyDataExtractor: CompositePropertyDataExtractor::createDefault());
+
+// Disable all validation constraints for performance
+$generator = new Generator(propertyDataExtractor: new CompositePropertyDataExtractor([]));
+```
+
+### Custom Property Data Extractors
+
+You can create custom property data extractors by implementing the `PropertyDataExtractorInterface`:
+
+```php
+use Spiral\JsonSchemaGenerator\Validation\PropertyDataExtractorInterface;
+use Spiral\JsonSchemaGenerator\Parser\PropertyInterface;
+use Spiral\JsonSchemaGenerator\Schema\Type;
+
+class CustomConstraintExtractor implements PropertyDataExtractorInterface
+{
+    public function extractValidationRules(PropertyInterface $property, Type $jsonSchemaType): array
+    {
+        $rules = [];
+        
+        // Your custom constraint extraction logic here
+        // For example, extract constraints from custom attributes or naming conventions
+        
+        return $rules;
+    }
+}
+
+// Use your custom extractor
+$generator = new Generator(
+    propertyDataExtractor: CompositePropertyDataExtractor::createDefault()
+        ->withExtractor(new CustomConstraintExtractor())
+);
+
 
 ### Installation
 

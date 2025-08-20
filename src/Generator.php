@@ -14,19 +14,20 @@ use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
 use Spiral\JsonSchemaGenerator\Schema\PropertyType;
-use Spiral\JsonSchemaGenerator\Validation\ValidationConstraintExtractor;
+use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
+use Spiral\JsonSchemaGenerator\Validation\PropertyDataExtractorInterface;
 
 final class Generator implements GeneratorInterface
 {
     protected array $cache = [];
-    private readonly ValidationConstraintExtractor $validationExtractor;
+    protected readonly PropertyDataExtractorInterface $propertyDataExtractor;
 
     public function __construct(
         protected readonly ParserInterface $parser = new Parser(),
-        ?ValidationConstraintExtractor $validationExtractor = null,
-        protected readonly GeneratorConfig $config = new GeneratorConfig(),
+        ?PropertyDataExtractorInterface $propertyDataExtractor = null,
     ) {
-        $this->validationExtractor = $validationExtractor ?? new ValidationConstraintExtractor();
+        // If no extractor is provided, use the default composite with all extractors
+        $this->propertyDataExtractor = $propertyDataExtractor ?? CompositePropertyDataExtractor::createDefault();
     }
 
     /**
@@ -128,11 +129,8 @@ final class Generator implements GeneratorInterface
         $type = $property->getType();
         $propertyTypes = $this->extractPropertyTypes($type);
 
-        // Extract validation constraints from PHPDoc (if enabled)
-        $validationRules = [];
-        if ($this->config->enableValidationConstraints) {
-            $validationRules = $this->extractValidationConstraints($property, $propertyTypes);
-        }
+        // Extract validation constraints using the configurable extractor system
+        $validationRules = $this->extractValidationConstraints($property, $propertyTypes);
 
         return new Property(
             types: $propertyTypes,
@@ -164,7 +162,7 @@ final class Generator implements GeneratorInterface
     }
 
     /**
-     * Extract validation constraints from property PHPDoc
+     * Extract validation constraints from property using the configured extractors.
      */
     private function extractValidationConstraints(PropertyInterface $property, array $propertyTypes): array
     {
@@ -172,7 +170,7 @@ final class Generator implements GeneratorInterface
 
         foreach ($propertyTypes as $propertyType) {
             if ($propertyType->type instanceof Schema\Type) {
-                $validationRules = $this->validationExtractor->extractValidationRules($property, $propertyType->type);
+                $validationRules = $this->propertyDataExtractor->extractValidationRules($property, $propertyType->type);
                 $allValidationRules = \array_merge($allValidationRules, $validationRules);
             }
         }
