@@ -22,4 +22,3 @@ documents:
       - type: file
         sourcePaths:
           - src
-          - tests/Unit

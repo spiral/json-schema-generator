@@ -7,12 +7,31 @@
 [![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 
+## Overview
+
 The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/)
 from Data Transfer Object (DTO) classes.
-It supports PHP enumerations and generic type annotations for arrays and provides an attribute for specifying title,
-description, and default value.
 
-Main use case - structured output definition for LLMs.
+**Main use case**: Structured output definition for LLMs.
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Class Properties and Enums](#class-properties-and-enums)
+- [Array Type Annotations](#array-type-annotations)
+- [Polymorphic Arrays (anyOf)](#polymorphic-arrays-anyof)
+- [Union Types](#union-types)
+- [Constraint Attributes](#constraint-attributes)
+- [PHPDoc Validation Constraints](#phpdoc-validation-constraints)
+- [Format Support](#format-support)
+- [Additional Properties](#additional-properties)
+- [Configuration Options](#configuration-options)
+- [Integration with Valinor](#integration-with-valinor)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Requirements
 
@@ -28,13 +47,9 @@ You can install the package via Composer:
 composer require spiral/json-schema-generator
 ```
 
-## Usage
+## Basic Usage
 
-To generate a schema for a DTO, instantiate the `Spiral\JsonSchemaGenerator\Generator` and call the **generate** method,
-passing the DTO class as an argument (fully qualified class name or reflection). The method will return an instance of
-`Spiral\JsonSchemaGenerator\Schema`.
-
-Let's create a simple DTO:
+Let's create a simple DTO with an enum:
 
 ```php
 namespace App\DTO;
@@ -46,22 +61,20 @@ class Movie
     public function __construct(
         #[Field(title: 'Title', description: 'The title of the movie')]
         public readonly string $title,
+        
         #[Field(title: 'Year', description: 'The year of the movie')]
         public readonly int $year,
+        
         #[Field(title: 'Description', description: 'The description of the movie')]
         public readonly ?string $description = null,
+        
         public readonly ?string $director = null,
+        
         #[Field(title: 'Release Status', description: 'The release status of the movie')]
         public readonly ?ReleaseStatus $releaseStatus = null,
     ) {
     }
 }
-```
-
-This DTO has a **releaseStatus**, which is an enum. Let's create it:
-
-```php
-namespace App\DTO;
 
 enum ReleaseStatus: string
 {
@@ -72,10 +85,11 @@ enum ReleaseStatus: string
     case Planned = 'Planned';
     case Canceled = 'Canceled';
 }
-
 ```
 
-Now, let's generate a schema for this DTO:
+To generate a schema for a DTO, instantiate the `Spiral\JsonSchemaGenerator\Generator` and call the **generate** method,
+passing the DTO class as an argument (fully qualified class name or reflection). The method will return an instance of
+`Spiral\JsonSchemaGenerator\Schema`.
 
 ```php
 use Spiral\JsonSchemaGenerator\Generator;
@@ -83,16 +97,20 @@ use App\DTO\Movie;
 
 $generator = new Generator();
 $schema = $generator->generate(Movie::class);
+
+// Convert to JSON
+$jsonSchema = json_encode($schema, JSON_PRETTY_PRINT);
+
+// Or use as array
+$arraySchema = $schema->jsonSerialize();
 ```
 
 > **Note**
-> Additionally, the package provides the `Spiral\JsonSchemaGenerator\GeneratorInterface,` which can be integrated into
+> The package provides the `Spiral\JsonSchemaGenerator\GeneratorInterface,` which can be integrated into
 > your application's dependency container for further customization and flexibility.
 
-The `Spiral\JsonSchemaGenerator\Schema` object implements the **JsonSerializable** interface, allowing easy conversion
-of the schema into either JSON or a PHP array.
 
-Example array output:
+The generated schema for this DTO would include the following structure:
 
 ```php
 [
@@ -149,9 +167,9 @@ Example array output:
 ];
 ```
 
-Class properties can be arrays, and the type of elements within the array can be specified using PHPDoc annotations.
+## Array Type Annotations
 
-For example, we have a DTO with an array of objects:
+The generator supports arrays of objects with type information from PHPDoc annotations:
 
 ```php
 namespace App\DTO;
@@ -162,34 +180,31 @@ final class Actor
 {
     public function __construct(
         public readonly string $name,
+        
         /**
          * @var array<Movie>
          */
         public readonly ?array $movies = null,
-        public readonly ?Movie $bestMovie = null;
+        
+        #[Field(title: 'Best Movie', description: 'The best movie of the actor')]
+        public readonly ?Movie $bestMovie = null,
     ) {
     }
 }
 ```
 
-In this example, we use a PHPDoc block to indicate that the property **$movies** contains an array of **Movie** objects.
-
 > **Note**
-> Various documentation type annotations are supported, including `@var array<Movie>`, `@var Movie[]`,
-> and `@var list<Movie>`. For promoted properties, you can use annotations like `@param array<Movie> $movies`,
-> `@param Movie[] $movies`, and `@param list<Movie> $movies`.
+> Various documentation type annotations are supported:
+> - `@var array<Movie>`
+> - `@var Movie[]`
+> - `@var list<Movie>`
+>
+> For constructor-promoted properties, you can use annotations like:
+> - `@param array<Movie> $movies`
+> - `@param Movie[] $movies`
+> - `@param list<Movie> $movies`
 
-Now, let's generate a schema for this DTO:
-
-```php
-use Spiral\JsonSchemaGenerator\Generator;
-use App\DTO\Actor;
-
-$generator = new Generator();
-$schema = $generator->generate(Actor::class);
-```
-
-Example array output:
+Generated schema (simplified):
 
 ```php
 [
@@ -214,18 +229,12 @@ Example array output:
             'title'       => 'Best Movie',
             'description' => 'The best movie of the actor',
             'oneOf'       => [
-                [
-                    'type' => 'null',
-                ],
-                [
-                    '$ref' => '#/definitions/Movie',
-                ],
+                ['type' => 'null'],
+                ['$ref' => '#/definitions/Movie'],
             ],
         ],
     ],
-    'required'   => [
-        'name',
-    ],
+    'required'   => ['name'],
     'definitions' => [
         'Movie'         => [
             'title'      => 'Movie',
@@ -276,9 +285,8 @@ Example array output:
 
 ## Polymorphic Arrays (anyOf)
 
-The generator also supports arrays that contain different types of DTOs using PHPDoc annotations like **@var list<
-Movie|Series>**.
-For example, if an actor can have a filmography that includes both movies and TV series, you can define it like this:
+The generator supports arrays that contain different types of DTOs using PHPDoc annotations like
+`@var list<Movie|Series>`:
 
 ```php
 namespace App\DTO;
@@ -289,27 +297,23 @@ final class Actor
 {
     public function __construct(
         public readonly string $name,
-        public readonly int $age,
-
-        #[Field(title: 'Biography', description: 'The biography of the actor')]
-        public readonly ?string $bio = null,
-
+        
         /**
          * @var list<Movie|Series>|null
          */
         #[Field(title: 'Filmography', description: 'List of movies and series featuring the actor')]
         public readonly ?array $filmography = null,
-
+        
         #[Field(title: 'Best Movie', description: 'The best movie of the actor')]
         public readonly ?Movie $bestMovie = null,
-
+        
         #[Field(title: 'Best Series', description: 'The most prominent series of the actor')]
         public readonly ?Series $bestSeries = null,
     ) {}
 }
 ```
 
-The generated schema will reflect this with an anyOf definition in the items section:
+The generated schema will include an `anyOf` definition in the items section:
 
 ```php
 [
@@ -332,13 +336,11 @@ The generated schema will reflect this with an anyOf definition in the items sec
         ],
     ],
     'definitions' => [
-        'Movie'  => [/* ... */],
-        'Series' => [/* ... */],
+        'Movie'  => [/* Movie schema definition */],
+        'Series' => [/* Series schema definition */],
     ],
 ];
 ```
-
-## Example DTO: Series
 
 Here's what the Series class might look like:
 
@@ -346,7 +348,7 @@ Here's what the Series class might look like:
 namespace App\DTO;
 
 use Spiral\JsonSchemaGenerator\Attribute\Field;
-use Spiral\JsonSchemaGenerator\Attribute\Format;
+use Spiral\JsonSchemaGenerator\Schema\Format;
 
 final class Series
 {
@@ -376,17 +378,24 @@ final class Series
         public readonly ?int $seasons = null,
     ) {}
 }
+
+enum SeriesStatus: string
+{
+    case Running = 'Running';
+    case Ended = 'Ended';
+    case Canceled = 'Canceled';
+    case OnHiatus = 'On Hiatus';
+}
 ```
 
 > **Note**
-> When using polymorphic arrays, make sure all referenced DTOs (e.g., Movie, Series)
-> are also annotated properly so their definitions can be generated correctly.
+> When using polymorphic arrays, make sure all referenced DTOs are properly annotated so their definitions can be
+> generated correctly.
 
 ## Union Types
 
 The JSON Schema Generator supports native PHP union types (introduced in PHP 8.0), including nullable and multi-type
-definitions.
-Here's an example DTO using union types:
+definitions:
 
 ```php
 namespace App\DTO;
@@ -443,10 +452,6 @@ The generated schema will include a `oneOf` section to reflect the union types:
 ]
 ```
 
-> **Note**
-> All supported types are automatically resolved from native PHP type declarations and reflected in the JSON Schema
-> output using oneOf.
-
 ## Constraint Attributes
 
 Generator supports dedicated constraint attributes that provide a clean, modular approach to validation rules.
@@ -482,6 +487,7 @@ namespace App\DTO;
 use Spiral\JsonSchemaGenerator\Attribute\Field;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\Pattern;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\Length;
+use Spiral\JsonSchemaGenerator\Schema\Format;
 
 final readonly class User
 {
@@ -791,6 +797,133 @@ final class ContactInfo
 - `Format::Uuid` - UUID format
 - `Format::Regex` - Regular expression format
 
+## Additional Properties
+
+The generator supports defining additional properties for object types using the `AdditionalProperties` attribute. This
+is useful for creating dynamic objects with a specific property type.
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Attribute\AdditionalProperties;
+
+final class DynamicConfig
+{
+    public function __construct(
+        #[Field(title: 'Config Name', description: 'Name of the configuration set')]
+        public readonly string $name,
+        
+        #[Field(title: 'Version', description: 'Configuration version')]
+        public readonly int $version,
+        
+        /**
+         * Dynamic settings map that can contain any string values
+         */
+        #[Field(title: 'Settings', description: 'Dynamic configuration settings')]
+        #[AdditionalProperties(valueType: 'string')]
+        public readonly array $settings = [],
+        
+        /**
+         * Dynamic metadata with nested ValueObject instances
+         */
+        #[Field(title: 'Metadata', description: 'Dynamic configuration metadata')]
+        #[AdditionalProperties(valueType: 'object', valueClass: ValueObject::class)]
+        public readonly array $metadata = [],
+    ) {}
+}
+
+final class ValueObject
+{
+    public function __construct(
+        public readonly string $label,
+        public readonly mixed $value,
+    ) {}
+}
+```
+
+The generated schema will include `additionalProperties` definitions:
+
+```php
+[
+    'properties' => [
+        'name' => [
+            'title' => 'Config Name',
+            'description' => 'Name of the configuration set',
+            'type' => 'string',
+        ],
+        'version' => [
+            'title' => 'Version',
+            'description' => 'Configuration version',
+            'type' => 'integer',
+        ],
+        'settings' => [
+            'title' => 'Settings',
+            'description' => 'Dynamic configuration settings',
+            'type' => 'object',
+            'additionalProperties' => [
+                'type' => 'string',
+            ],
+        ],
+        'metadata' => [
+            'title' => 'Metadata',
+            'description' => 'Dynamic configuration metadata',
+            'type' => 'object',
+            'additionalProperties' => [
+                '$ref' => '#/definitions/ValueObject',
+            ],
+        ],
+    ],
+    'required' => ['name', 'version'],
+    'definitions' => [
+        'ValueObject' => [
+            'type' => 'object',
+            'properties' => [
+                'label' => ['type' => 'string'],
+                'value' => ['type' => 'string'],
+            ],
+            'required' => ['label', 'value'],
+        ],
+    ],
+]
+```
+
+### Supported Value Types
+
+The `AdditionalProperties` attribute supports the following value types:
+
+- Basic types: `'string'`, `'integer'`, `'number'`, `'boolean'`
+- Object type: `'object'` (requires `valueClass` parameter for class references)
+- Any type: `'mixed'` (translates to `additionalProperties: true`)
+
+### Example with Multiple Dynamic Property Types
+
+```php
+namespace App\DTO;
+
+use Spiral\JsonSchemaGenerator\Attribute\Field;
+use Spiral\JsonSchemaGenerator\Attribute\AdditionalProperties;
+
+final class ApiResponse
+{
+    public function __construct(
+        public readonly bool $success,
+        
+        #[Field(title: 'Data', description: 'API response data with any structure')]
+        #[AdditionalProperties(valueType: 'mixed')]
+        public readonly array $data = [],
+        
+        #[Field(title: 'Errors', description: 'Error messages by field name')]
+        #[AdditionalProperties(valueType: 'string')]
+        public readonly array $errors = [],
+        
+        #[Field(title: 'Meta', description: 'Response metadata')]
+        #[AdditionalProperties(valueType: 'object', valueClass: MetaValue::class)]
+        public readonly array $meta = [],
+    ) {}
+}
+```
+
 ## Configuration Options
 
 ```php
@@ -798,6 +931,7 @@ use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\PhpDocValidationConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
+use Spiral\JsonSchemaGenerator\Validation\AdditionalPropertiesExtractor;
 
 // Use default extractors (recommended for most cases)
 $generator = new Generator(
@@ -808,14 +942,15 @@ $generator = new Generator(
 $compositeExtractor = new CompositePropertyDataExtractor([
     new PhpDocValidationConstraintExtractor(),
     new AttributeConstraintExtractor(),
+    new AdditionalPropertiesExtractor(),
 ]);
 
 $generator = new Generator(
-    ropertyDataExtractor: $compositeExtractor,
+    propertyDataExtractor: $compositeExtractor,
 );
 ```
 
-#### Property Data Extractors
+### Property Data Extractors
 
 The generator uses a modular property data extractor system that allows you to customize how validation constraints are
 extracted from properties:
@@ -824,6 +959,7 @@ extracted from properties:
 
 - `PhpDocValidationConstraintExtractor` - Extracts constraints from PHPDoc comments
 - `AttributeConstraintExtractor` - Extracts constraints from PHP attributes
+- `AdditionalPropertiesExtractor` - Processes additional properties settings
 - `CompositePropertyDataExtractor` - Combines multiple extractors
 
 **Usage Examples:**
@@ -1062,10 +1198,6 @@ try {
 ```bash
 composer test
 ```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 
