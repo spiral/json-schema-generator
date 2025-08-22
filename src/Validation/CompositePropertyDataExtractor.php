@@ -24,6 +24,7 @@ final readonly class CompositePropertyDataExtractor implements PropertyDataExtra
         return new self([
             new PhpDocValidationConstraintExtractor(),
             new AttributeConstraintExtractor(),
+            new AdditionalPropertiesExtractor(), // Add the new extractor
         ]);
     }
 

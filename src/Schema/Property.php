@@ -44,8 +44,12 @@ final readonly class Property implements \JsonSerializable
 
         // Check if we have an array shape constraint that should override the type
         if (isset($this->validationRules['type']) && $this->validationRules['type'] === 'object') {
-            // Array shape overrides normal type processing
+            // Array shape or additional properties overrides normal type processing
             $property = \array_merge($property, $this->validationRules);
+
+            // Clean up internal metadata keys
+            unset($property['_additionalPropertiesClass']);
+
             return $property;
         }
 
@@ -61,7 +65,7 @@ final readonly class Property implements \JsonSerializable
         // Apply validation rules from PHPDoc constraints (except type overrides)
         $filteredValidationRules = $this->validationRules;
         if (isset($filteredValidationRules['type'])) {
-            unset($filteredValidationRules['type'], $filteredValidationRules['properties'], $filteredValidationRules['required'], $filteredValidationRules['additionalProperties']);
+            unset($filteredValidationRules['type'], $filteredValidationRules['properties'], $filteredValidationRules['required'], $filteredValidationRules['additionalProperties'], $filteredValidationRules['_additionalPropertiesClass']);
         }
         $property = \array_merge($property, $filteredValidationRules);
 
@@ -82,6 +86,11 @@ final readonly class Property implements \JsonSerializable
                     }
                 }
             }
+        }
+
+        // Extract dependencies from additional properties references
+        if (isset($this->validationRules['_additionalPropertiesClass'])) {
+            $dependencies[] = $this->validationRules['_additionalPropertiesClass'];
         }
 
         return $dependencies;
@@ -107,7 +116,11 @@ final readonly class Property implements \JsonSerializable
                             }
                             $property['items']['anyOf'][] = $schemaType;
                         } else {
-                            $property['items']['anyOf'][] = ['$ref' => (new Reference($collectionType->type))->jsonSerialize()];
+                            $property['items']['anyOf'][] = [
+                                '$ref' => (new Reference(
+                                    $collectionType->type,
+                                ))->jsonSerialize(),
+                            ];
                         }
                     }
                 } elseif ($collectionTypeCount === 1) {
