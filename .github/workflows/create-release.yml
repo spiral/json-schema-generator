@@ -1,0 +1,26 @@
+---
+
+# https://github.com/google-github-actions/release-please-action#release-types-supported
+# https://github.com/googleapis/release-please/blob/main/docs/customizing.md
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - 1.x
+
+name: 📦 Create release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🎉 Create release
+        uses: google-github-actions/release-please-action@v4.1.0
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/.release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
+          target-branch: 1.x
+
+...
