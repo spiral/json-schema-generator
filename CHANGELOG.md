@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.1](https://github.com/spiral/json-schema-generator/compare/v2.1.0...v2.1.1) (2026-08-23)
+
+
+### Dependencies
+
+* allow phpdocumentor/reflection-docblock 6.0 ([#23](https://github.com/spiral/json-schema-generator/issues/23)) ([1ef3885](https://github.com/spiral/json-schema-generator/commit/1ef3885956e4c5fe7840b8da978343ee7766df3f))
+
+
+### Continuous Integration
+
+* setup release-please ([9dc3643](https://github.com/spiral/json-schema-generator/commit/9dc3643259d96da006a8814cac3165a6909579a7))
+
 ## [1.3.0] – 2025-07-21
 
 ### Added
@@ -63,4 +75,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 > **Note**
 > This version takes advantage of updated type system features and is intended for use with modern Symfony applications.
-
