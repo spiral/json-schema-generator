@@ -22,7 +22,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class {
                 /**
-                 * @var array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                 * @var array<array-key, Movie>
                  */
                 public array $collection;
             },
@@ -31,7 +31,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class {
                 /**
-                 * @var array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                 * @var array<Movie>
                  */
                 public array $collection;
             },
@@ -40,7 +40,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class {
                 /**
-                 * @var \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[]
+                 * @var Movie[]
                  */
                 public array $collection;
             },
@@ -49,7 +49,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class {
                 /**
-                 * @var list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                 * @var list<Movie>
                  */
                 public array $collection;
             },
@@ -59,7 +59,7 @@ final class ClassParserTest extends TestCase
             new class([]) {
                 public function __construct(
                     /**
-                     * @var array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                     * @var array<array-key, Movie>
                      */
                     public array $collection,
                 ) {}
@@ -70,7 +70,7 @@ final class ClassParserTest extends TestCase
             new class([]) {
                 public function __construct(
                     /**
-                     * @var array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                     * @var array<Movie>
                      */
                     public array $collection,
                 ) {}
@@ -81,7 +81,7 @@ final class ClassParserTest extends TestCase
             new class([]) {
                 public function __construct(
                     /**
-                     * @var \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[]
+                     * @var Movie[]
                      */
                     public array $collection,
                 ) {}
@@ -92,7 +92,7 @@ final class ClassParserTest extends TestCase
             new class([]) {
                 public function __construct(
                     /**
-                     * @var list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie>
+                     * @var list<Movie>
                      */
                     public array $collection,
                 ) {}
@@ -102,7 +102,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class([]) {
                 /**
-                 * @param array<array-key, \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
+                 * @param array<array-key, Movie> $collection
                  */
                 public function __construct(
                     public array $collection,
@@ -113,7 +113,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class([]) {
                 /**
-                 * @param array<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
+                 * @param array<Movie> $collection
                  */
                 public function __construct(
                     public array $collection,
@@ -124,7 +124,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class([]) {
                 /**
-                 * @param \Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie[] $collection
+                 * @param Movie[] $collection
                  */
                 public function __construct(
                     public array $collection,
@@ -135,7 +135,7 @@ final class ClassParserTest extends TestCase
         yield [
             new class([]) {
                 /**
-                 * @param list<\Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie> $collection
+                 * @param list<Movie> $collection
                  */
                 public function __construct(
                     public array $collection,
