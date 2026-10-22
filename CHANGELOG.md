@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.2](https://github.com/spiral/json-schema-generator/compare/v2.1.1...v2.1.2) (2026-10-22)
+
+
+### Continuous Integration
+
+* run cs-fix on the minimum supported PHP ([#27](https://github.com/spiral/json-schema-generator/issues/27)) ([9fffe9f](https://github.com/spiral/json-schema-generator/commit/9fffe9f82ad1ca6b053f322fb00ebfad3662634f))
+
 ## [2.1.1](https://github.com/spiral/json-schema-generator/compare/v2.1.0...v2.1.1) (2026-08-23)
 
 
