@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Validation;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\Enum;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\Items;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\Length;
@@ -16,8 +15,12 @@ use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
+use Testo\Assert;
+use Testo\Lifecycle\BeforeTest;
+use Testo\Test;
 
-final class AttributeConstraintExtractorTest extends TestCase
+#[Test]
+final class AttributeConstraintExtractorTest
 {
     private AttributeConstraintExtractor $extractor;
 
@@ -37,7 +40,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals(['pattern' => '^[a-zA-Z]+$'], $rules);
+        Assert::equals($rules, ['pattern' => '^[a-zA-Z]+$']);
     }
 
     public function testExtractLengthConstraintForString(): void
@@ -56,7 +59,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals(['minLength' => 3, 'maxLength' => 20], $rules);
+        Assert::equals($rules, ['minLength' => 3, 'maxLength' => 20]);
     }
 
     public function testExtractLengthConstraintForArray(): void
@@ -75,7 +78,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::Array);
 
-        $this->assertEquals(['minItems' => 1, 'maxItems' => 5], $rules);
+        Assert::equals($rules, ['minItems' => 1, 'maxItems' => 5]);
     }
 
     public function testExtractRangeConstraint(): void
@@ -94,7 +97,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::Integer);
 
-        $this->assertEquals(['minimum' => 0, 'maximum' => 100], $rules);
+        Assert::equals($rules, ['minimum' => 0, 'maximum' => 100]);
     }
 
     public function testExtractRangeConstraintWithExclusiveBounds(): void
@@ -113,10 +116,10 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::Number);
 
-        $this->assertEquals([
+        Assert::equals($rules, [
             'exclusiveMinimum' => 0,
             'exclusiveMaximum' => 100,
-        ], $rules);
+        ]);
     }
 
     public function testExtractMultipleOfConstraintForInteger(): void
@@ -135,7 +138,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::Integer);
 
-        $this->assertEquals(['multipleOf' => 5], $rules);
+        Assert::equals($rules, ['multipleOf' => 5]);
     }
 
     public function testExtractMultipleOfConstraintIgnoredForString(): void
@@ -154,7 +157,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals([], $rules);
+        Assert::equals($rules, []);
     }
 
     public function testExtractItemsConstraint(): void
@@ -173,11 +176,11 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::Array);
 
-        $this->assertEquals([
+        Assert::equals($rules, [
             'minItems' => 2,
             'maxItems' => 10,
             'uniqueItems' => true,
-        ], $rules);
+        ]);
     }
 
     public function testExtractItemsConstraintIgnoredForString(): void
@@ -196,7 +199,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals([], $rules);
+        Assert::equals($rules, []);
     }
 
     public function testExtractEnumConstraint(): void
@@ -215,7 +218,7 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals(['enum' => ['active', 'inactive', 'pending']], $rules);
+        Assert::equals($rules, ['enum' => ['active', 'inactive', 'pending']]);
     }
 
     public function testExtractMultipleConstraints(): void
@@ -236,12 +239,12 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals([
+        Assert::equals($rules, [
             'pattern' => '^[a-zA-Z]+$',
             'minLength' => 3,
             'maxLength' => 20,
             'enum' => ['admin', 'user', 'guest'],
-        ], $rules);
+        ]);
     }
 
     public function testNoConstraintsReturnsEmptyArray(): void
@@ -259,9 +262,10 @@ final class AttributeConstraintExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals([], $rules);
+        Assert::equals($rules, []);
     }
 
+    #[BeforeTest]
     protected function setUp(): void
     {
         $this->extractor = new AttributeConstraintExtractor();

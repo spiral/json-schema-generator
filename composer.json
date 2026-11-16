@@ -29,10 +29,10 @@
     "phpdocumentor/reflection-docblock": "^5.3 || ^6.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5.45",
+    "rector/rector": "^2.0",
     "spiral/code-style": "^2.2.2",
-    "vimeo/psalm": "^6.10",
-    "rector/rector": "^2.0"
+    "testo/testo": "^0.10.56",
+    "vimeo/psalm": "^6.10 || ^7"
   },
   "autoload": {
     "psr-4": {
@@ -49,8 +49,7 @@
     "psalm": "psalm",
     "refactor": "rector process --config=rector.php",
     "refactor:ci": "rector process --config=rector.php --dry-run --ansi",
-    "test": "phpunit",
-    "test-coverage": "phpunit --coverage",
+    "test": "testo",
     "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml"
   },
   "config": {

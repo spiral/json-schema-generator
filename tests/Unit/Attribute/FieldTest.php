@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Attribute;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\Field;
 use Spiral\JsonSchemaGenerator\Schema\Format;
+use Testo\Assert;
+use Testo\Test;
 
-final class FieldTest extends TestCase
+#[Test]
+final class FieldTest
 {
     #[Field]
     private string $default = '';
@@ -22,9 +24,9 @@ final class FieldTest extends TestCase
 
         $attr = $ref->getAttributes(Field::class)[0]->newInstance();
 
-        $this->assertSame('', $attr->title);
-        $this->assertSame('', $attr->description);
-        $this->assertNull($attr->default);
+        Assert::same($attr->title, '');
+        Assert::same($attr->description, '');
+        Assert::null($attr->default);
     }
 
     public function testFieldWithValues(): void
@@ -33,9 +35,9 @@ final class FieldTest extends TestCase
 
         $attr = $ref->getAttributes(Field::class)[0]->newInstance();
 
-        $this->assertSame('Title', $attr->title);
-        $this->assertSame('Description', $attr->description);
-        $this->assertSame('foo', $attr->default);
+        Assert::same($attr->title, 'Title');
+        Assert::same($attr->description, 'Description');
+        Assert::same($attr->default, 'foo');
     }
 
     public function testFieldWithFormat(): void
@@ -43,7 +45,7 @@ final class FieldTest extends TestCase
         $ref = new \ReflectionProperty(self::class, 'withValues');
 
         $attr = $ref->getAttributes(Field::class)[0]->newInstance();
-        $this->assertInstanceOf(Format::class, $attr->format);
-        $this->assertSame('email', $attr->format->value);
+        Assert::instanceOf($attr->format, Format::class);
+        Assert::same($attr->format->value, 'email');
     }
 }

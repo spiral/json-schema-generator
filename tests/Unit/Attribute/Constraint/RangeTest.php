@@ -4,68 +4,70 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Attribute\Constraint;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\Range;
+use Testo\Assert;
+use Testo\Test;
 
-final class RangeTest extends TestCase
+#[Test]
+final class RangeTest
 {
     public function testRangeWithIntegerBounds(): void
     {
         $range = new Range(min: 0, max: 100);
 
-        $this->assertSame(0, $range->min);
-        $this->assertSame(100, $range->max);
-        $this->assertNull($range->exclusiveMin);
-        $this->assertNull($range->exclusiveMax);
+        Assert::same($range->min, 0);
+        Assert::same($range->max, 100);
+        Assert::null($range->exclusiveMin);
+        Assert::null($range->exclusiveMax);
     }
 
     public function testRangeWithFloatBounds(): void
     {
         $range = new Range(min: 0.5, max: 99.9);
 
-        $this->assertSame(0.5, $range->min);
-        $this->assertSame(99.9, $range->max);
+        Assert::same($range->min, 0.5);
+        Assert::same($range->max, 99.9);
     }
 
     public function testRangeWithExclusiveBounds(): void
     {
         $range = new Range(min: 0, max: 100, exclusiveMin: true, exclusiveMax: true);
 
-        $this->assertSame(0, $range->min);
-        $this->assertSame(100, $range->max);
-        $this->assertTrue($range->exclusiveMin);
-        $this->assertTrue($range->exclusiveMax);
+        Assert::same($range->min, 0);
+        Assert::same($range->max, 100);
+        Assert::true($range->exclusiveMin);
+        Assert::true($range->exclusiveMax);
     }
 
     public function testRangeWithMixedExclusivity(): void
     {
         $range = new Range(min: 0, max: 100, exclusiveMin: true, exclusiveMax: false);
 
-        $this->assertTrue($range->exclusiveMin);
-        $this->assertFalse($range->exclusiveMax);
+        Assert::true($range->exclusiveMin);
+        Assert::false($range->exclusiveMax);
     }
 
     public function testRangeWithOnlyMin(): void
     {
         $range = new Range(min: 18);
 
-        $this->assertSame(18, $range->min);
-        $this->assertNull($range->max);
+        Assert::same($range->min, 18);
+        Assert::null($range->max);
     }
 
     public function testRangeWithOnlyMax(): void
     {
         $range = new Range(max: 120);
 
-        $this->assertNull($range->min);
-        $this->assertSame(120, $range->max);
+        Assert::null($range->min);
+        Assert::same($range->max, 120);
     }
 
     public function testRangeWithNegativeValues(): void
     {
         $range = new Range(min: -100, max: -10);
 
-        $this->assertSame(-100, $range->min);
-        $this->assertSame(-10, $range->max);
+        Assert::same($range->min, -100);
+        Assert::same($range->max, -10);
     }
 }

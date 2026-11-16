@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Schema\PropertyOptions;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Testo\Assert;
+use Testo\Test;
 
-final class PropertyOptionsTest extends TestCase
+#[Test]
+final class PropertyOptionsTest
 {
     public function testPropertyOptions(): void
     {
@@ -18,13 +20,13 @@ final class PropertyOptionsTest extends TestCase
             Type::Integer,
         ]);
 
-        $this->assertEquals([
+        Assert::equals($options->jsonSerialize(), [
             [
                 '$ref' => '#/definitions/Movie',
             ],
             [
                 'type' => 'integer',
             ],
-        ], $options->jsonSerialize());
+        ]);
     }
 }

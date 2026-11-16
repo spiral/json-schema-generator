@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Schema\Reference;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Test;
 
-final class ReferenceTest extends TestCase
+#[Test]
+final class ReferenceTest
 {
     public static function referencesDataProvider(): \Traversable
     {
@@ -20,6 +22,6 @@ final class ReferenceTest extends TestCase
     #[DataProvider('referencesDataProvider')]
     public function testReference(string $class, string $expected): void
     {
-        $this->assertEquals($expected, (new Reference($class))->jsonSerialize());
+        Assert::equals((new Reference($class))->jsonSerialize(), $expected);
     }
 }

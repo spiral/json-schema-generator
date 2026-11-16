@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Schema;
 use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Testo\Assert;
+use Testo\Test;
 
-final class SchemaTest extends TestCase
+#[Test]
+final class SchemaTest
 {
     public function testEmpty(): void
     {
         $schema = new Schema();
 
-        $this->assertSame(['type' => 'object'], $schema->jsonSerialize());
+        Assert::same($schema->jsonSerialize(), ['type' => 'object']);
     }
 
     public function testStringProperty(): void
@@ -31,22 +33,19 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'name' => [
-                        'title' => 'Name',
-                        'description' => 'Name of the user',
-                        'type' => 'string',
-                    ],
-                ],
-                'required'   => [
-                    'name',
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'name' => [
+                    'title' => 'Name',
+                    'description' => 'Name of the user',
+                    'type' => 'string',
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+            'required'   => [
+                'name',
+            ],
+        ]);
     }
 
     public function testScalarProperties(): void
@@ -92,39 +91,36 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'name'      => [
-                        'title'       => 'Name',
-                        'description' => 'Name of the user',
-                        'type'        => 'string',
-                    ],
-                    'age'       => [
-                        'title'       => 'Age',
-                        'description' => 'Age of the user',
-                        'type'        => 'integer',
-                    ],
-                    'height'    => [
-                        'title'       => 'Height',
-                        'description' => 'Height of the user',
-                        'type'        => 'number',
-                    ],
-                    'is_active' => [
-                        'title'       => 'Is Active',
-                        'description' => 'Is the user active',
-                        'type'        => 'boolean',
-                    ],
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'name'      => [
+                    'title'       => 'Name',
+                    'description' => 'Name of the user',
+                    'type'        => 'string',
                 ],
-                'required'   => [
-                    'name',
-                    'age',
-                    'height',
+                'age'       => [
+                    'title'       => 'Age',
+                    'description' => 'Age of the user',
+                    'type'        => 'integer',
+                ],
+                'height'    => [
+                    'title'       => 'Height',
+                    'description' => 'Height of the user',
+                    'type'        => 'number',
+                ],
+                'is_active' => [
+                    'title'       => 'Is Active',
+                    'description' => 'Is the user active',
+                    'type'        => 'boolean',
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+            'required'   => [
+                'name',
+                'age',
+                'height',
+            ],
+        ]);
     }
 
     public function testArrayProperty(): void
@@ -140,25 +136,22 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'hobbies' => [
-                        'type'        => 'array',
-                        'items'       => [
-                            'type' => 'string',
-                        ],
-                        'title'       => 'Hobbies',
-                        'description' => 'Hobbies of the user',
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'hobbies' => [
+                    'type'        => 'array',
+                    'items'       => [
+                        'type' => 'string',
                     ],
-                ],
-                'required'   => [
-                    'hobbies',
+                    'title'       => 'Hobbies',
+                    'description' => 'Hobbies of the user',
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+            'required'   => [
+                'hobbies',
+            ],
+        ]);
     }
 
     public function testArrayPropertyWithMultipleTypes(): void
@@ -174,28 +167,25 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'hobbies' => [
-                        'type'        => 'array',
-                        'items'       => [
-                            'anyOf' => [
-                                ['type' => 'string'],
-                                ['type' => 'number'],
-                            ],
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'hobbies' => [
+                    'type'        => 'array',
+                    'items'       => [
+                        'anyOf' => [
+                            ['type' => 'string'],
+                            ['type' => 'number'],
                         ],
-                        'title'       => 'Hobbies',
-                        'description' => 'Hobbies of the user',
                     ],
-                ],
-                'required'   => [
-                    'hobbies',
+                    'title'       => 'Hobbies',
+                    'description' => 'Hobbies of the user',
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+            'required'   => [
+                'hobbies',
+            ],
+        ]);
     }
 
     public function testClassProperty(): void
@@ -210,18 +200,15 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'movie' => [
-                        'title' => 'Some movie',
-                        '$ref' => '#/definitions/Movie',
-                    ],
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'movie' => [
+                    'title' => 'Some movie',
+                    '$ref' => '#/definitions/Movie',
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+        ]);
     }
 
     public function testClassArrayProperty(): void
@@ -236,21 +223,18 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'movie' => [
-                        'title' => 'Some movie',
-                        'type'  => 'array',
-                        'items' => [
-                            '$ref' => '#/definitions/Movie',
-                        ],
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'movie' => [
+                    'title' => 'Some movie',
+                    'type'  => 'array',
+                    'items' => [
+                        '$ref' => '#/definitions/Movie',
                     ],
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+        ]);
     }
 
     public function testArrayOfClassesAndStrings(): void
@@ -265,28 +249,25 @@ final class SchemaTest extends TestCase
             ),
         );
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'movie' => [
-                        'title' => 'Some movie',
-                        'type'  => 'array',
-                        'items' => [
-                            'anyOf' => [
-                                [
-                                    '$ref' => '#/definitions/Movie',
-                                ],
-                                [
-                                    'type' => 'string',
-                                ],
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties' => [
+                'movie' => [
+                    'title' => 'Some movie',
+                    'type'  => 'array',
+                    'items' => [
+                        'anyOf' => [
+                            [
+                                '$ref' => '#/definitions/Movie',
+                            ],
+                            [
+                                'type' => 'string',
                             ],
                         ],
                     ],
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+        ]);
     }
 
     public function testNestedDefinition(): void
@@ -315,42 +296,39 @@ final class SchemaTest extends TestCase
 
         $schema->addDefinition('Movie', $definition);
 
-        $this->assertEquals(
-            [
-                'type' => 'object',
-                'properties'  => [
-                    'movie' => [
-                        'title' => 'Some movie',
-                        'type'  => 'array',
-                        'items' => [
-                            'anyOf' => [
-                                [
-                                    '$ref' => '#/definitions/Movie',
-                                ],
-                                [
-                                    'type' => 'string',
-                                ],
+        Assert::equals($schema->jsonSerialize(), [
+            'type' => 'object',
+            'properties'  => [
+                'movie' => [
+                    'title' => 'Some movie',
+                    'type'  => 'array',
+                    'items' => [
+                        'anyOf' => [
+                            [
+                                '$ref' => '#/definitions/Movie',
                             ],
-                        ],
-                    ],
-                ],
-                'definitions' => [
-                    'Movie' => [
-                        'type'       => 'object',
-                        'properties' => [
-                            'title' => [
-                                'type'        => 'string',
-                                'title'       => 'Title',
-                                'description' => 'Title of the movie',
+                            [
+                                'type' => 'string',
                             ],
-                        ],
-                        'required'   => [
-                            'title',
                         ],
                     ],
                 ],
             ],
-            $schema->jsonSerialize(),
-        );
+            'definitions' => [
+                'Movie' => [
+                    'type'       => 'object',
+                    'properties' => [
+                        'title' => [
+                            'type'        => 'string',
+                            'title'       => 'Title',
+                            'description' => 'Title of the movie',
+                        ],
+                    ],
+                    'required'   => [
+                        'title',
+                    ],
+                ],
+            ],
+        ]);
     }
 }
