@@ -62,6 +62,7 @@ final class ClassParser implements ClassParserInterface
     /**
      * @return class-string
      */
+    #[\Override]
     public function getName(): string
     {
         return $this->class->getName();
@@ -70,6 +71,7 @@ final class ClassParser implements ClassParserInterface
     /**
      * @return non-empty-string
      */
+    #[\Override]
     public function getShortName(): string
     {
         return $this->class->getShortName();
@@ -78,6 +80,7 @@ final class ClassParser implements ClassParserInterface
     /**
      * @return array<PropertyInterface>
      */
+    #[\Override]
     public function getProperties(): array
     {
         $properties = [];

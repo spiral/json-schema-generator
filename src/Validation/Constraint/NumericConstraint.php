@@ -9,6 +9,7 @@ namespace Spiral\JsonSchemaGenerator\Validation\Constraint;
  */
 final class NumericConstraint extends AbstractConstraint
 {
+    #[\Override]
     public function toJsonSchema(): array
     {
         return match ($this->type) {

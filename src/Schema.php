@@ -19,6 +19,7 @@ final class Schema extends AbstractDefinition
         return $this;
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $schema = $this->renderProperties(['type' => 'object']);

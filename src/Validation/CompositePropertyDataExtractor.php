@@ -36,6 +36,7 @@ final readonly class CompositePropertyDataExtractor implements PropertyDataExtra
         return new self([...$this->extractors, $extractor]);
     }
 
+    #[\Override]
     public function extractValidationRules(PropertyInterface $property, Type $jsonSchemaType): array
     {
         $allValidationRules = [];

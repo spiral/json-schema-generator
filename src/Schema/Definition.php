@@ -36,6 +36,7 @@ final class Definition extends AbstractDefinition
         }
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $schema = [];

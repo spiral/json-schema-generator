@@ -11,6 +11,7 @@ use Spiral\JsonSchemaGenerator\Schema\Type;
 
 final readonly class AdditionalPropertiesExtractor implements PropertyDataExtractorInterface
 {
+    #[\Override]
     public function extractValidationRules(PropertyInterface $property, Type $jsonSchemaType): array
     {
         $validationRules = [];

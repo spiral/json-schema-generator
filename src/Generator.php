@@ -33,6 +33,7 @@ final class Generator implements GeneratorInterface
     /**
      * @param class-string|\ReflectionClass $class
      */
+    #[\Override]
     public function generate(string|\ReflectionClass $class): Schema
     {
         $class = $this->parser->parse($class);

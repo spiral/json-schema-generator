@@ -33,16 +33,19 @@ final readonly class SimpleType implements TypeInterface
     /**
      * @return class-string|SchemaType
      */
+    #[\Override]
     public function getName(): string|SchemaType
     {
         return $this->name;
     }
 
+    #[\Override]
     public function isBuiltin(): bool
     {
         return $this->builtin;
     }
 
+    #[\Override]
     public function isEnum(): bool
     {
         return $this->enum !== null;
@@ -51,6 +54,7 @@ final readonly class SimpleType implements TypeInterface
     /**
      * @return list<int|string>|null
      */
+    #[\Override]
     public function getEnumValues(): ?array
     {
         return $this->enum;

@@ -23,6 +23,7 @@ final readonly class Property implements \JsonSerializable
         public array $validationRules = [], // NEW: Validation rules from PHPDoc
     ) {}
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $property = [];

@@ -12,6 +12,7 @@ final class Parser implements ParserInterface
     /**
      * @param class-string|\ReflectionClass $class
      */
+    #[\Override]
     public function parse(\ReflectionClass|string $class): ClassParserInterface
     {
         return new ClassParser($class);
