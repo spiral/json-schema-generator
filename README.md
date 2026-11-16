@@ -1201,7 +1201,7 @@ composer test
 
 ## Contributing
 
-Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](https://github.com/spiral/.github/blob/main/.github/CONTRIBUTING.md) for details.
 
 ## License
 
