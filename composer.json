@@ -45,6 +45,7 @@
   "require-dev": {
     "bamarni/composer-bin-plugin": "^1.8",
     "rector/rector": "^2.0",
+    "testo/bridge-infection": "^0.1.9",
     "testo/testo": "^0.10.56",
     "vimeo/psalm": "^6.10 || ^7"
   },
@@ -61,6 +62,14 @@
   "scripts": {
     "cs:diff": "php-cs-fixer fix --dry-run -v --diff --config=vendor-bin/code-style/.php-cs-fixer.dist.php",
     "cs:fix": "php-cs-fixer fix -v --config=vendor-bin/code-style/.php-cs-fixer.dist.php",
+    "infect": [
+      "@putenv XDEBUG_MODE=coverage",
+      "infection --threads=max --min-msi=80 --min-covered-msi=80"
+    ],
+    "infect:ci": [
+      "@putenv XDEBUG_MODE=coverage",
+      "infection --ansi --threads=max --logger-github --show-mutations=0 --min-msi=80 --min-covered-msi=80"
+    ],
     "psalm": "psalm",
     "refactor": "rector process --config=rector.php",
     "refactor:ci": "rector process --config=rector.php --dry-run --ansi",

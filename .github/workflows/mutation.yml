@@ -1,0 +1,47 @@
+---
+
+name: Mutation Tests
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+  push:
+    branches: [2.x]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  mutation:
+    name: Infection
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: xdebug
+          ini-values: memory_limit=-1
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: highest
+
+      # Infection lives in vendor-bin/infection (bamarni/composer-bin-plugin), out of the root require-dev.
+      - name: Install Infection
+        run: composer bin infection install --no-interaction --no-progress
+
+      - name: Run Infection
+        run: composer infect:ci
+        env:
+          STRYKER_DASHBOARD_API_KEY: ${{ github.event_name == 'push' && secrets.STRYKER_DASHBOARD_API_KEY || '' }}
