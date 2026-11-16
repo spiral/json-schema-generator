@@ -15,18 +15,18 @@ use Spiral\JsonSchemaGenerator\Validation\Constraint\StringConstraint;
  */
 final class ConstraintMapper
 {
+    /**
+     * @param list<string|array<string, mixed>> $constraints
+     * @return array<string, mixed>
+     */
     public function mapConstraintsToJsonSchema(array $constraints, Type $jsonSchemaType): array
     {
         $validationRules = [];
 
         foreach ($constraints as $constraint) {
-            if (\is_string($constraint)) {
-                $constraintObj = $this->createConstraintObject($constraint);
-            } elseif (\is_array($constraint)) {
-                $constraintObj = $this->createConstraintObjectFromArray($constraint);
-            } else {
-                continue;
-            }
+            $constraintObj = \is_string($constraint)
+                ? $this->createConstraintObject($constraint)
+                : $this->createConstraintObjectFromArray($constraint);
 
             if ($constraintObj && $this->isConstraintApplicable($constraintObj, $jsonSchemaType)) {
                 $rules = $constraintObj->toJsonSchema();
@@ -50,14 +50,16 @@ final class ConstraintMapper
         };
     }
 
+    /**
+     * @param array<string, mixed> $constraint
+     */
     private function createConstraintObjectFromArray(array $constraint): ?AbstractConstraint
     {
         $type = \array_key_first($constraint);
-        $value = $type !== null ? $constraint[$type] : null;
 
         return match ($type) {
-            'int-range' => new NumericConstraint($type, $value),
-            'array-shape' => new ArrayConstraint($type, $value),
+            'int-range' => new NumericConstraint($type, $constraint[$type]),
+            'array-shape' => new ArrayConstraint($type, $constraint[$type]),
             default => null,
         };
     }

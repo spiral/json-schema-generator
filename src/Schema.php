@@ -11,6 +11,7 @@ use Spiral\JsonSchemaGenerator\Schema\Definition;
  */
 final class Schema extends AbstractDefinition
 {
+    /** @var array<string, Definition> */
     private array $definitions = [];
 
     public function addDefinition(string $name, Definition $definition): self

@@ -13,6 +13,9 @@ final class DocBlockParser
     private const string INT_RANGE_PATTERN = '/int<([^>]+)>/';
     private const string ARRAY_SHAPE_PATTERN = '/array\{([^}]+)\}/';
 
+    /**
+     * @return list<string|array<string, mixed>>
+     */
     public function parseDocComment(string $docComment): array
     {
         $constraints = [];
@@ -27,6 +30,9 @@ final class DocBlockParser
         return $constraints;
     }
 
+    /**
+     * @return list<string|array<string, mixed>>
+     */
     private function parseTypeAnnotation(string $type): array
     {
         $constraints = [];
@@ -70,6 +76,9 @@ final class DocBlockParser
         return $constraints;
     }
 
+    /**
+     * @return list{string, string}|null
+     */
     private function parseIntRange(string $rangeStr): ?array
     {
         $parts = \array_map('trim', \explode(',', $rangeStr));
@@ -81,6 +90,9 @@ final class DocBlockParser
         return [$parts[0], $parts[1]];
     }
 
+    /**
+     * @return array<array-key, string>
+     */
     private function parseArrayShape(string $shapeStr): array
     {
         $shape = [];

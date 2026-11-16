@@ -19,7 +19,9 @@ use Spiral\JsonSchemaGenerator\Validation\PropertyDataExtractorInterface;
 
 final class Generator implements GeneratorInterface
 {
+    /** @var array<class-string, Schema> */
     protected array $cache = [];
+
     protected readonly PropertyDataExtractorInterface $propertyDataExtractor;
 
     public function __construct(
@@ -90,6 +92,10 @@ final class Generator implements GeneratorInterface
         return $schema;
     }
 
+    /**
+     * @param array<class-string> $dependencies Collects the classes the definition refers to.
+     * @param-out array<class-string> $dependencies
+     */
     protected function generateDefinition(ClassParserInterface $class, array &$dependencies = []): ?Definition
     {
         $properties = [];
@@ -119,11 +125,13 @@ final class Generator implements GeneratorInterface
         if ($attribute !== null) {
             $title = $attribute->title;
             $description = $attribute->description;
+            /** @var mixed $default */
             $default = $attribute->default;
             $format = $attribute->format;
         }
 
         if ($default === null && $property->hasDefaultValue()) {
+            /** @var mixed $default */
             $default = $property->getDefaultValue();
         }
 
@@ -164,6 +172,9 @@ final class Generator implements GeneratorInterface
 
     /**
      * Extract validation constraints from property using the configured extractors.
+     *
+     * @param list<PropertyType> $propertyTypes
+     * @return array<string, mixed>
      */
     private function extractValidationConstraints(PropertyInterface $property, array $propertyTypes): array
     {

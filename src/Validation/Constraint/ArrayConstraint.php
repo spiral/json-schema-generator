@@ -19,6 +19,9 @@ final class ArrayConstraint extends AbstractConstraint
         };
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function parseArrayShape(): array
     {
         if (!\is_array($this->value)) {
@@ -28,7 +31,11 @@ final class ArrayConstraint extends AbstractConstraint
         $properties = [];
         $required = [];
 
-        foreach ($this->value as $key => $spec) {
+        /** @var array<array-key, string> $shape */
+        $shape = $this->value;
+
+        foreach ($shape as $key => $spec) {
+            /** @psalm-suppress MixedArgumentTypeCoercion Numeric keys are a known bug: https://github.com/spiral/json-schema-generator/issues/42 */
             $isOptional = \str_ends_with($key, '?');
             $cleanKey = $isOptional ? \rtrim($key, '?') : $key;
 

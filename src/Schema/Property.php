@@ -36,7 +36,7 @@ final readonly class Property implements \JsonSerializable
         }
 
         if ($this->default !== null) {
-            $property['default'] = $this->default;
+            $property += ['default' => $this->default];
         }
 
         if ($this->format instanceof Format) {
@@ -73,6 +73,9 @@ final readonly class Property implements \JsonSerializable
         return $property;
     }
 
+    /**
+     * @return list<class-string>
+     */
     public function getDependencies(): array
     {
         $dependencies = [];
@@ -91,7 +94,9 @@ final readonly class Property implements \JsonSerializable
 
         // Extract dependencies from additional properties references
         if (isset($this->validationRules['_additionalPropertiesClass'])) {
-            $dependencies[] = $this->validationRules['_additionalPropertiesClass'];
+            /** @var class-string $class */
+            $class = $this->validationRules['_additionalPropertiesClass'];
+            $dependencies[] = $class;
         }
 
         return $dependencies;
