@@ -12,5 +12,9 @@ return new ApplicationConfig(
             name: 'Unit',
             location: ['tests/Unit'],
         ),
+        new SuiteConfig(
+            name: 'Acceptance',
+            location: ['tests/Acceptance'],
+        ),
     ],
 );
