@@ -4,6 +4,7 @@
         "directories": ["src"]
     },
     "testFramework": "testo",
+    "testFrameworkOptions": "--suite=Unit",
     "tmpDir": "runtime",
     "timeout": 10,
     "logs": {

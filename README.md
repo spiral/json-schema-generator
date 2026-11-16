@@ -115,6 +115,7 @@ The generated schema for this DTO would include the following structure:
 
 ```php
 [
+    'type'        => 'object',
     'properties'  => [
         'title'         => [
             'title'       => 'Title',
@@ -205,10 +206,11 @@ final class Actor
 > - `@param Movie[] $movies`
 > - `@param list<Movie> $movies`
 
-Generated schema (simplified):
+Generated schema:
 
 ```php
 [
+    'type'       => 'object',
     'properties' => [
         'name'   => [
             'type' => 'string',
@@ -270,9 +272,11 @@ Generated schema (simplified):
                     'description' => 'The release status of the movie',
                     'oneOf'       => [
                         ['type' => 'null'],
-                        ['type' => 'string'],
+                        [
+                            'type' => 'string',
+                            'enum' => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
+                        ],
                     ],
-                    'enum'        => ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
                 ],
             ],
             'required'   => [
@@ -865,6 +869,7 @@ The generated schema will include `additionalProperties` definitions:
             'additionalProperties' => [
                 'type' => 'string',
             ],
+            'default' => [],
         ],
         'metadata' => [
             'title' => 'Metadata',
@@ -873,15 +878,17 @@ The generated schema will include `additionalProperties` definitions:
             'additionalProperties' => [
                 '$ref' => '#/definitions/ValueObject',
             ],
+            'default' => [],
         ],
     ],
     'required' => ['name', 'version'],
     'definitions' => [
         'ValueObject' => [
+            'title' => 'ValueObject',
             'type' => 'object',
             'properties' => [
                 'label' => ['type' => 'string'],
-                'value' => ['type' => 'string'],
+                'value' => new \stdClass(), // `mixed`: any value
             ],
             'required' => ['label', 'value'],
         ],
