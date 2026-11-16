@@ -11,3 +11,5 @@ node_modules
 .context
 mcp-*.log
 runtime
+/vendor-bin/*/vendor/
+/vendor-bin/*/composer.lock
