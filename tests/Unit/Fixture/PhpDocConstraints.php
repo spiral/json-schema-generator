@@ -21,5 +21,7 @@ final readonly class PhpDocConstraints
         public string $className,
         /** @var array{name: string, age?: int, score: float, active: bool} */
         public array $shape,
+        /** @var array{0: string, 1: int} */
+        public array $tuple,
     ) {}
 }

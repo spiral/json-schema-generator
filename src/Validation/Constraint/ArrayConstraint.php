@@ -34,8 +34,13 @@ final class ArrayConstraint extends AbstractConstraint
         /** @var array<array-key, string> $shape */
         $shape = $this->value;
 
+        // A tuple shape (`array{0: string, 1: int}`) cannot become an object schema:
+        // PHP turns the numeric keys back into a list, which serializes as a JSON array.
         foreach ($shape as $key => $spec) {
-            /** @psalm-suppress MixedArgumentTypeCoercion Numeric keys are a known bug: https://github.com/spiral/json-schema-generator/issues/42 */
+            if (\is_int($key)) {
+                return [];
+            }
+
             $isOptional = \str_ends_with($key, '?');
             $cleanKey = $isOptional ? \rtrim($key, '?') : $key;
 
