@@ -11,6 +11,7 @@ use Spiral\JsonSchemaGenerator\Schema\Definition;
  */
 final class Schema extends AbstractDefinition
 {
+    /** @var array<string, Definition> */
     private array $definitions = [];
 
     public function addDefinition(string $name, Definition $definition): self
@@ -19,6 +20,7 @@ final class Schema extends AbstractDefinition
         return $this;
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $schema = $this->renderProperties(['type' => 'object']);

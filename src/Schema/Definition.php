@@ -22,6 +22,7 @@ final class Definition extends AbstractDefinition
         public readonly string $description = '',
         array $properties = [],
     ) {
+        /** @var array<non-empty-string, mixed> $properties */
         foreach ($properties as $name => $property) {
             if (!$property instanceof Property) {
                 throw new DefinitionException(\sprintf(
@@ -36,6 +37,7 @@ final class Definition extends AbstractDefinition
         }
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $schema = [];

@@ -19,6 +19,7 @@ final readonly class Property implements PropertyInterface
     /**
      * @return non-empty-string
      */
+    #[\Override]
     public function getName(): string
     {
         return $this->property->getName();
@@ -31,6 +32,7 @@ final readonly class Property implements PropertyInterface
      *
      * @return T|null The attribute or {@see null}, if the requested attribute does not exist.
      */
+    #[\Override]
     public function findAttribute(string $name): ?object
     {
         $name = $this->property->getAttributes($name);
@@ -41,16 +43,19 @@ final readonly class Property implements PropertyInterface
         return null;
     }
 
+    #[\Override]
     public function hasDefaultValue(): bool
     {
         return $this->hasDefaultValue;
     }
 
+    #[\Override]
     public function getDefaultValue(): mixed
     {
         return $this->defaultValue;
     }
 
+    #[\Override]
     public function getType(): Type
     {
         return $this->type;

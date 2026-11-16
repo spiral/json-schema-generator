@@ -62,6 +62,7 @@ final class ClassParser implements ClassParserInterface
     /**
      * @return class-string
      */
+    #[\Override]
     public function getName(): string
     {
         return $this->class->getName();
@@ -70,6 +71,7 @@ final class ClassParser implements ClassParserInterface
     /**
      * @return non-empty-string
      */
+    #[\Override]
     public function getShortName(): string
     {
         return $this->class->getShortName();
@@ -78,6 +80,7 @@ final class ClassParser implements ClassParserInterface
     /**
      * @return array<PropertyInterface>
      */
+    #[\Override]
     public function getProperties(): array
     {
         $properties = [];
@@ -124,9 +127,12 @@ final class ClassParser implements ClassParserInterface
 
         $reflectionEnum = new \ReflectionEnum($typeName);
 
+        /** @var list<\ReflectionEnumBackedCase> $cases */
+        $cases = $reflectionEnum->getCases();
+
         return \array_map(
-            static fn(\ReflectionEnumUnitCase $case): int|string => $case->getValue()->value,
-            $reflectionEnum->getCases(),
+            static fn(\ReflectionEnumBackedCase $case): int|string => $case->getBackingValue(),
+            $cases,
         );
     }
 
@@ -210,11 +216,13 @@ final class ClassParser implements ClassParserInterface
     private function getPropertyDefaultValue(\ReflectionProperty $property): mixed
     {
         if ($property->hasDefaultValue()) {
+            /** @var mixed $default */
             $default = $property->getDefaultValue();
         }
 
         $parameter = $this->constructorParameters[$property->getName()] ?? null;
         if ($parameter !== null && $property->isPromoted() && $parameter->isDefaultValueAvailable()) {
+            /** @var mixed $default */
             $default = $parameter->getDefaultValue();
         }
 

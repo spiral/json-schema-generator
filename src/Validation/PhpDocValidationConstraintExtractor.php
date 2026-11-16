@@ -14,6 +14,7 @@ final readonly class PhpDocValidationConstraintExtractor implements PropertyData
         private ConstraintMapper $constraintMapper = new ConstraintMapper(),
     ) {}
 
+    #[\Override]
     public function extractValidationRules(PropertyInterface $property, Type $jsonSchemaType): array
     {
         $docComment = $this->getPropertyDocComment($property);
@@ -41,6 +42,7 @@ final readonly class PhpDocValidationConstraintExtractor implements PropertyData
         // Try to get the ReflectionProperty from the Property object
         try {
             $propertyField = $reflection->getProperty('property');
+            /** @var mixed $propertyReflection */
             $propertyReflection = $propertyField->getValue($property);
         } catch (\ReflectionException) {
             return null;
