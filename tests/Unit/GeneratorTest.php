@@ -7,7 +7,9 @@ namespace Spiral\JsonSchemaGenerator\Tests\Unit;
 use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Actor;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\FlexibleValue;
+use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Library;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\PropertyVisibility;
 use Testo\Assert;
 use Testo\Test;
 
@@ -321,5 +323,40 @@ final class GeneratorTest
             ],
             'required' => ['value'],
         ]);
+    }
+
+    public function testTransitiveDependenciesBecomeDefinitions(): void
+    {
+        $schema = \json_decode(\json_encode((new Generator())->generate(Library::class)), true);
+
+        Assert::same($schema['properties'], ['shelf' => ['$ref' => '#/definitions/Shelf']]);
+        Assert::same(\array_keys($schema['definitions']), ['Shelf', 'Book']);
+        Assert::same($schema['definitions']['Shelf']['properties'], [
+            'featured' => ['$ref' => '#/definitions/Book'],
+            'books' => [
+                'default' => [],
+                'type' => 'array',
+                'items' => ['$ref' => '#/definitions/Book'],
+            ],
+        ]);
+        Assert::same($schema['definitions']['Book']['properties']['priority'], [
+            'default' => 1,
+            'type' => 'integer',
+            'enum' => [1, 2],
+        ]);
+    }
+
+    public function testOnlyPublicTypedInstancePropertiesAreIncluded(): void
+    {
+        $schema = (new Generator())->generate(PropertyVisibility::class)->jsonSerialize();
+
+        Assert::same(\array_keys($schema['properties']), ['public']);
+    }
+
+    public function testSchemaIsCachedPerClass(): void
+    {
+        $generator = new Generator();
+
+        Assert::same($generator->generate(Library::class), $generator->generate(Library::class));
     }
 }
