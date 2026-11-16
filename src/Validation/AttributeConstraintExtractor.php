@@ -22,13 +22,13 @@ final readonly class AttributeConstraintExtractor implements PropertyDataExtract
 
         // Extract Pattern constraint
         $pattern = $property->findAttribute(Pattern::class);
-        if ($pattern instanceof Pattern) {
+        if ($pattern instanceof Pattern && $jsonSchemaType === Type::String) {
             $validationRules['pattern'] = $pattern->pattern;
         }
 
         // Extract Length constraint
         $length = $property->findAttribute(Length::class);
-        if ($length instanceof Length) {
+        if ($length instanceof Length && ($jsonSchemaType === Type::String || $jsonSchemaType === Type::Array)) {
             if ($length->min !== null) {
                 $validationRules[$this->getLengthMinKey($jsonSchemaType)] = $length->min;
             }
@@ -39,7 +39,7 @@ final readonly class AttributeConstraintExtractor implements PropertyDataExtract
 
         // Extract Range constraint
         $range = $property->findAttribute(Range::class);
-        if ($range instanceof Range) {
+        if ($range instanceof Range && $this->isNumericType($jsonSchemaType)) {
             if ($range->min !== null) {
                 $key = $range->exclusiveMin === true ? 'exclusiveMinimum' : 'minimum';
                 $validationRules[$key] = $range->min;

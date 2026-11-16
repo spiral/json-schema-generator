@@ -265,6 +265,26 @@ final class AttributeConstraintExtractorTest
         Assert::equals($rules, []);
     }
 
+    public function testConstraintsSkipIncompatibleTypes(): void
+    {
+        $testClass = new class {
+            #[Pattern('^\d+$')]
+            #[Range(min: 1, max: 5)]
+            #[Length(min: 2, max: 4)]
+            public string $value;
+        };
+
+        $propertyWrapper = new Property(
+            property: new \ReflectionProperty($testClass, 'value'),
+            type: new Type([new SimpleType('string', true)]),
+            hasDefaultValue: false,
+        );
+
+        Assert::same($this->extractor->extractValidationRules($propertyWrapper, SchemaType::Integer), ['minimum' => 1, 'maximum' => 5]);
+        Assert::same($this->extractor->extractValidationRules($propertyWrapper, SchemaType::String), ['pattern' => '^\d+$', 'minLength' => 2, 'maxLength' => 4]);
+        Assert::same($this->extractor->extractValidationRules($propertyWrapper, SchemaType::Boolean), []);
+    }
+
     #[BeforeTest]
     protected function setUp(): void
     {
