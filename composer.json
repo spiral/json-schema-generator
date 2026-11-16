@@ -43,8 +43,8 @@
     "phpdocumentor/reflection-docblock": "^5.3 || ^6.0"
   },
   "require-dev": {
+    "bamarni/composer-bin-plugin": "^1.8",
     "rector/rector": "^2.0",
-    "spiral/code-style": "^2.2.2",
     "testo/testo": "^0.10.56",
     "vimeo/psalm": "^6.10 || ^7"
   },
@@ -59,7 +59,8 @@
     }
   },
   "scripts": {
-    "cs:fix": "php-cs-fixer fix -v",
+    "cs:diff": "php-cs-fixer fix --dry-run -v --diff --config=vendor-bin/code-style/.php-cs-fixer.dist.php",
+    "cs:fix": "php-cs-fixer fix -v --config=vendor-bin/code-style/.php-cs-fixer.dist.php",
     "psalm": "psalm",
     "refactor": "rector process --config=rector.php",
     "refactor:ci": "rector process --config=rector.php --dry-run --ansi",
@@ -67,7 +68,17 @@
     "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml"
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "bamarni/composer-bin-plugin": true
+    }
+  },
+  "extra": {
+    "bamarni-bin": {
+      "bin-links": true,
+      "forward-command": false,
+      "target-directory": "vendor-bin"
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true
