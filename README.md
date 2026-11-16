@@ -1,27 +1,28 @@
-# JSON Schema Generator
+<p align="center">
+    <a href="https://spiral.dev"><img alt="Spiral" src="https://raw.githubusercontent.com/spiral/.github/main/logo.svg" style="width: 6in; display: block"></a>
+</p>
 
-[![PHP Version Require](https://poser.pugx.org/spiral/json-schema-generator/require/php)](https://packagist.org/packages/spiral/json-schema-generator)
-[![Latest Stable Version](https://poser.pugx.org/spiral/json-schema-generator/v/stable)](https://packagist.org/packages/spiral/json-schema-generator)
-[![testo](https://github.com/spiral/json-schema-generator/actions/workflows/testo.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
-[![psalm](https://github.com/spiral/json-schema-generator/actions/workflows/psalm.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
-[![Codecov](https://codecov.io/gh/spiral/json-schema-generator/branch/2.x/graph/badge.svg)](https://codecov.io/gh/spiral/json-schema-generator)
+<p align="center">JSON Schema from PHP DTO classes</p>
+
+<div align="center">
+
+[![Sponsor](https://img.shields.io/static/v1?style=for-the-badge&label=&message=Sponsor&logo=githubsponsors&logoColor=white&color=%23EA4AAA)](https://github.com/sponsors/spiral)
+
+[![Psalm Level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
+[![Type Coverage](https://shepherd.dev/github/spiral/json-schema-generator/coverage.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fspiral%2Fjson-schema-generator%2F2.x)](https://dashboard.stryker-mutator.io/reports/github.com/spiral/json-schema-generator/2.x)
-[![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
-[![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
+[![Codecov](https://codecov.io/gh/spiral/json-schema-generator/branch/2.x/graph/badge.svg)](https://codecov.io/gh/spiral/json-schema-generator)
 
-## Overview
+</div>
 
-The JSON Schema Generator is a PHP package that simplifies the generation of [JSON schemas](https://json-schema.org/)
-from Data Transfer Object (DTO) classes.
+<br />
 
-**Main use case**: Structured output definition for LLMs.
+This package generates [JSON schemas](https://json-schema.org/) from Data Transfer Object (DTO) classes. Its main use case is defining structured output and tool parameters for LLMs.
 
 ## Table of Contents
 
-- [Requirements](#requirements)
-- [Installation](#installation)
+- [Get Started](#get-started)
 - [Basic Usage](#basic-usage)
-- [Class Properties and Enums](#class-properties-and-enums)
 - [Array Type Annotations](#array-type-annotations)
 - [Polymorphic Arrays (anyOf)](#polymorphic-arrays-anyof)
 - [Union Types](#union-types)
@@ -33,21 +34,19 @@ from Data Transfer Object (DTO) classes.
 - [Integration with Valinor](#integration-with-valinor)
 - [Testing](#testing)
 - [Contributing](#contributing)
-- [License](#license)
 
-## Requirements
+## Get Started
 
-Make sure that your server is configured with the following PHP versions and extensions:
-
-- PHP >=8.3
-
-## Installation
-
-You can install the package via Composer:
+### Installation
 
 ```bash
 composer require spiral/json-schema-generator
 ```
+
+[![PHP](https://img.shields.io/packagist/php-v/spiral/json-schema-generator.svg?style=flat-square&logo=php)](https://packagist.org/packages/spiral/json-schema-generator)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/spiral/json-schema-generator.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/spiral/json-schema-generator)
+[![License](https://img.shields.io/packagist/l/spiral/json-schema-generator.svg?style=flat-square)](LICENSE)
+[![Total Downloads](https://img.shields.io/packagist/dt/spiral/json-schema-generator.svg?style=flat-square)](https://packagist.org/packages/spiral/json-schema-generator/stats)
 
 ## Basic Usage
 
@@ -1204,7 +1203,3 @@ composer test
 ## Contributing
 
 Please see [CONTRIBUTING](https://github.com/spiral/.github/blob/main/.github/CONTRIBUTING.md) for details.
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
