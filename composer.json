@@ -48,6 +48,7 @@
     "llm/skills": "^1.19",
     "rector/rector": "^2.0",
     "roxblnfk/unpoly": "^1.8",
+    "spiral/dumper": "^3.3",
     "testo/bridge-infection": "^0.1.9",
     "testo/testo": "^0.10.56"
   },
