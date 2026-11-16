@@ -4,6 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/spiral/json-schema-generator/v/stable)](https://packagist.org/packages/spiral/json-schema-generator)
 [![testo](https://github.com/spiral/json-schema-generator/actions/workflows/testo.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
 [![psalm](https://github.com/spiral/json-schema-generator/actions/workflows/psalm.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
+[![Codecov](https://codecov.io/gh/spiral/json-schema-generator/branch/2.x/graph/badge.svg)](https://codecov.io/gh/spiral/json-schema-generator)
 [![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 

@@ -11,6 +11,7 @@ use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\InvalidEnum;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Priority;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ReleaseStatus;
 use Testo\Assert;
 use Testo\Assert\ExpectException;
@@ -107,5 +108,27 @@ final class DefinitionTest
     public function testInvalidEnumException(): void
     {
         (new Definition(type: InvalidEnum::class))->jsonSerialize();
+    }
+
+    public function testIntBackedEnumDefinition(): void
+    {
+        $definition = new Definition(
+            type: Priority::class,
+            options: [1, 2],
+            title: 'Priority',
+            description: 'Task priority',
+        );
+
+        Assert::same($definition->jsonSerialize(), [
+            'title' => 'Priority',
+            'description' => 'Task priority',
+            'type' => 'number',
+            'enum' => [1, 2],
+        ]);
+    }
+
+    public function testSimpleTypeDefinition(): void
+    {
+        Assert::same((new Definition(type: Type::String))->jsonSerialize(), ['type' => 'string']);
     }
 }
