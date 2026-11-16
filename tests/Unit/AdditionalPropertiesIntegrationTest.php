@@ -38,7 +38,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'String-based configuration options',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['stringOptions'], $expected);
 
@@ -48,7 +48,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Numeric configuration values',
             'type' => 'object',
             'additionalProperties' => ['type' => 'integer'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['numericSettings'], $expected);
 
@@ -58,7 +58,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Dynamic data of any type',
             'type' => 'object',
             'additionalProperties' => true,
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['dynamicData'], $expected);
 
@@ -88,7 +88,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Service endpoints configuration',
             'type' => 'object',
             'additionalProperties' => ['$ref' => '#/definitions/ServiceEndpoint'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['endpoints'], $expected);
 
@@ -98,7 +98,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Feature flags and numeric settings',
             'type' => 'object',
             'additionalProperties' => ['type' => 'integer'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['featureFlags'], $expected);
 
@@ -108,7 +108,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Environment variables',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['environment'], $expected);
 
@@ -166,7 +166,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Driver-specific configuration options',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['driverOptions'], $expected);
     }
@@ -183,7 +183,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Custom user attributes and metadata',
             'type' => 'object',
             'additionalProperties' => true, // mixed type becomes true
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['attributes'], $expected);
 
@@ -193,7 +193,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'User preferences',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['preferences'], $expected);
     }
@@ -210,7 +210,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Translations for different locales',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['translations'], $expected);
 
@@ -220,7 +220,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Locale-specific metadata',
             'type' => 'object',
             'additionalProperties' => ['$ref' => '#/definitions/LocaleMetadata'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['localeMetadata'], $expected);
 
@@ -241,7 +241,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Dynamic response data',
             'type' => 'object',
             'additionalProperties' => true,
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['data'], $expected);
 
@@ -251,7 +251,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Response headers',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['headers'], $expected);
     }
@@ -272,7 +272,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'Product-specific attributes that vary by category',
             'type' => 'object',
             'additionalProperties' => true,
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['attributes'], $expected);
 
@@ -282,7 +282,7 @@ final class AdditionalPropertiesIntegrationTest
             'description' => 'SEO and marketing metadata',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
-            'default' => [],
+            'default' => new \stdClass(),
         ];
         Assert::equals($result['properties']['metadata'], $expected);
     }

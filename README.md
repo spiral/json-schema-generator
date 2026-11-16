@@ -752,7 +752,7 @@ The generated schema will include validation constraints:
             ],
             'required' => ['theme', 'notifications'],
             'additionalProperties' => false,
-            'default' => [],
+            'default' => new \stdClass(),
         ],
     ],
     'required' => ['name', 'age', 'score', 'email', 'phone'],
@@ -869,7 +869,7 @@ The generated schema will include `additionalProperties` definitions:
             'additionalProperties' => [
                 'type' => 'string',
             ],
-            'default' => [],
+            'default' => new \stdClass(),
         ],
         'metadata' => [
             'title' => 'Metadata',
@@ -878,7 +878,7 @@ The generated schema will include `additionalProperties` definitions:
             'additionalProperties' => [
                 '$ref' => '#/definitions/ValueObject',
             ],
-            'default' => [],
+            'default' => new \stdClass(),
         ],
     ],
     'required' => ['name', 'version'],
