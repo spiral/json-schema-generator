@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Parser;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Parser\ClassParser;
 use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ReleaseStatus;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Test;
 
-final class ClassParserTest extends TestCase
+#[Test]
+final class ClassParserTest
 {
     public static function collectionsDataProvider(): \Traversable
     {
@@ -149,14 +151,14 @@ final class ClassParserTest extends TestCase
     {
         $parser = new ClassParser(Movie::class);
 
-        $this->assertSame(Movie::class, $parser->getName());
+        Assert::same($parser->getName(), Movie::class);
     }
 
     public function testGetShortName(): void
     {
         $parser = new ClassParser(Movie::class);
 
-        $this->assertSame('Movie', $parser->getShortName());
+        Assert::same($parser->getShortName(), 'Movie');
     }
 
     public function testGetProperties(): void
@@ -165,60 +167,57 @@ final class ClassParserTest extends TestCase
 
         $properties = $parser->getProperties();
 
-        $this->assertSame('title', $properties[0]->getName());
-        $this->assertCount(1, $properties[0]->getType()->types);
-        $this->assertSame(Type::String, $properties[0]->getType()->types[0]->getName());
-        $this->assertFalse($properties[0]->getType()->allowsNull());
-        $this->assertFalse($properties[0]->getType()->types[0]->isCollection());
-        $this->assertFalse($properties[0]->hasDefaultValue());
+        Assert::same($properties[0]->getName(), 'title');
+        Assert::count($properties[0]->getType()->types, 1);
+        Assert::same($properties[0]->getType()->types[0]->getName(), Type::String);
+        Assert::false($properties[0]->getType()->allowsNull());
+        Assert::false($properties[0]->getType()->types[0]->isCollection());
+        Assert::false($properties[0]->hasDefaultValue());
 
-        $this->assertSame('year', $properties[1]->getName());
-        $this->assertSame(Type::Integer, $properties[1]->getType()->types[0]->getName());
-        $this->assertFalse($properties[1]->getType()->allowsNull());
-        $this->assertFalse($properties[1]->getType()->types[0]->isCollection());
-        $this->assertFalse($properties[1]->hasDefaultValue());
+        Assert::same($properties[1]->getName(), 'year');
+        Assert::same($properties[1]->getType()->types[0]->getName(), Type::Integer);
+        Assert::false($properties[1]->getType()->allowsNull());
+        Assert::false($properties[1]->getType()->types[0]->isCollection());
+        Assert::false($properties[1]->hasDefaultValue());
 
-        $this->assertSame('description', $properties[2]->getName());
-        $this->assertSame(Type::String, $properties[2]->getType()->types[1]->getName());
-        $this->assertTrue($properties[2]->getType()->allowsNull());
-        $this->assertFalse($properties[2]->getType()->types[0]->isCollection());
-        $this->assertTrue($properties[2]->hasDefaultValue());
-        $this->assertNull($properties[2]->getDefaultValue());
+        Assert::same($properties[2]->getName(), 'description');
+        Assert::same($properties[2]->getType()->types[1]->getName(), Type::String);
+        Assert::true($properties[2]->getType()->allowsNull());
+        Assert::false($properties[2]->getType()->types[0]->isCollection());
+        Assert::true($properties[2]->hasDefaultValue());
+        Assert::null($properties[2]->getDefaultValue());
 
-        $this->assertSame('director', $properties[3]->getName());
-        $this->assertSame(Type::String, $properties[3]->getType()->types[1]->getName());
-        $this->assertTrue($properties[3]->getType()->allowsNull());
-        $this->assertFalse($properties[3]->getType()->types[0]->isCollection());
-        $this->assertTrue($properties[3]->hasDefaultValue());
-        $this->assertNull($properties[3]->getDefaultValue());
+        Assert::same($properties[3]->getName(), 'director');
+        Assert::same($properties[3]->getType()->types[1]->getName(), Type::String);
+        Assert::true($properties[3]->getType()->allowsNull());
+        Assert::false($properties[3]->getType()->types[0]->isCollection());
+        Assert::true($properties[3]->hasDefaultValue());
+        Assert::null($properties[3]->getDefaultValue());
 
-        $this->assertSame('releaseStatus', $properties[4]->getName());
-        $this->assertSame(Type::String, $properties[4]->getType()->types[0]->getName());
-        $this->assertSame(Type::Null, $properties[4]->getType()->types[1]->getName());
-        $this->assertTrue($properties[4]->getType()->types[0]->isEnum());
-        $this->assertEquals(
-            ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled'],
-            $properties[4]->getType()->types[0]->getEnumValues(),
-        );
-        $this->assertTrue($properties[4]->getType()->allowsNull());
-        $this->assertFalse($properties[4]->getType()->types[0]->isCollection());
-        $this->assertTrue($properties[4]->hasDefaultValue());
-        $this->assertNull($properties[4]->getDefaultValue());
+        Assert::same($properties[4]->getName(), 'releaseStatus');
+        Assert::same($properties[4]->getType()->types[0]->getName(), Type::String);
+        Assert::same($properties[4]->getType()->types[1]->getName(), Type::Null);
+        Assert::true($properties[4]->getType()->types[0]->isEnum());
+        Assert::equals($properties[4]->getType()->types[0]->getEnumValues(), ['Released', 'Rumored', 'Post Production', 'In Production', 'Planned', 'Canceled']);
+        Assert::true($properties[4]->getType()->allowsNull());
+        Assert::false($properties[4]->getType()->types[0]->isCollection());
+        Assert::true($properties[4]->hasDefaultValue());
+        Assert::null($properties[4]->getDefaultValue());
     }
 
     public function testIsEnum(): void
     {
         $parser = new ClassParser(Movie::class);
-        $this->assertFalse($parser->isEnum());
+        Assert::false($parser->isEnum());
 
         $parser = new ClassParser(ReleaseStatus::class);
-        $this->assertTrue($parser->isEnum());
+        Assert::true($parser->isEnum());
     }
 
     #[DataProvider('collectionsDataProvider')]
     public function testGetPropertyCollectionTypes(object $class, ?array $expected): void
     {
         $parser = new ClassParser($class::class);
-        $this->assertEquals($expected, $parser->getProperties()[0]->getType()->types[0]->getCollectionType()?->types);
+        Assert::equals($parser->getProperties()[0]->getType()->types[0]->getCollectionType()?->types, $expected);
     }
 }

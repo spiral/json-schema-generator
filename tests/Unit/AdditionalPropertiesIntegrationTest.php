@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\AdditionalProperties;
 use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ApiResponse;
@@ -14,8 +13,11 @@ use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\LocalizableContent;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Product;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ServiceConfiguration;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\User;
+use Testo\Assert;
+use Testo\Test;
 
-final class AdditionalPropertiesIntegrationTest extends TestCase
+#[Test]
+final class AdditionalPropertiesIntegrationTest
 {
     public function testGenerateConfigurableObjectWithAdditionalProperties(): void
     {
@@ -24,49 +26,49 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test basic required properties
-        $this->assertArrayHasKey('properties', $result);
-        $this->assertArrayHasKey('name', $result['properties']);
-        $this->assertArrayHasKey('version', $result['properties']);
-        $this->assertEquals('string', $result['properties']['name']['type']);
-        $this->assertEquals('integer', $result['properties']['version']['type']);
+        Assert::array($result)->hasKeys('properties');
+        Assert::array($result['properties'])->hasKeys('name');
+        Assert::array($result['properties'])->hasKeys('version');
+        Assert::equals($result['properties']['name']['type'], 'string');
+        Assert::equals($result['properties']['version']['type'], 'integer');
 
         // Test string additional properties
-        $this->assertArrayHasKey('stringOptions', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('stringOptions');
         $expected = [
             'description' => 'String-based configuration options',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['stringOptions']);
+        Assert::equals($result['properties']['stringOptions'], $expected);
 
         // Test numeric additional properties
-        $this->assertArrayHasKey('numericSettings', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('numericSettings');
         $expected = [
             'description' => 'Numeric configuration values',
             'type' => 'object',
             'additionalProperties' => ['type' => 'integer'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['numericSettings']);
+        Assert::equals($result['properties']['numericSettings'], $expected);
 
         // Test mixed additional properties
-        $this->assertArrayHasKey('dynamicData', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('dynamicData');
         $expected = [
             'description' => 'Dynamic data of any type',
             'type' => 'object',
             'additionalProperties' => true,
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['dynamicData']);
+        Assert::equals($result['properties']['dynamicData'], $expected);
 
         // Check required properties
-        $this->assertArrayHasKey('required', $result);
-        $this->assertContains('name', $result['required']);
-        $this->assertContains('version', $result['required']);
-        $this->assertNotContains('stringOptions', $result['required']);
-        $this->assertNotContains('numericSettings', $result['required']);
-        $this->assertNotContains('dynamicData', $result['required']);
+        Assert::array($result)->hasKeys('required');
+        Assert::contains($result['required'], 'name');
+        Assert::contains($result['required'], 'version');
+        Assert::iterable($result['required'])->notContains('stringOptions');
+        Assert::iterable($result['required'])->notContains('numericSettings');
+        Assert::iterable($result['required'])->notContains('dynamicData');
     }
 
     public function testGenerateServiceConfigurationWithObjectReferences(): void
@@ -76,63 +78,63 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test basic properties
-        $this->assertArrayHasKey('properties', $result);
-        $this->assertEquals('string', $result['properties']['serviceName']['type']);
-        $this->assertEquals('string', $result['properties']['version']['type']);
+        Assert::array($result)->hasKeys('properties');
+        Assert::equals($result['properties']['serviceName']['type'], 'string');
+        Assert::equals($result['properties']['version']['type'], 'string');
 
         // Test object additional properties with class reference
-        $this->assertArrayHasKey('endpoints', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('endpoints');
         $expected = [
             'description' => 'Service endpoints configuration',
             'type' => 'object',
             'additionalProperties' => ['$ref' => '#/definitions/ServiceEndpoint'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['endpoints']);
+        Assert::equals($result['properties']['endpoints'], $expected);
 
         // Test integer additional properties
-        $this->assertArrayHasKey('featureFlags', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('featureFlags');
         $expected = [
             'description' => 'Feature flags and numeric settings',
             'type' => 'object',
             'additionalProperties' => ['type' => 'integer'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['featureFlags']);
+        Assert::equals($result['properties']['featureFlags'], $expected);
 
         // Test string additional properties
-        $this->assertArrayHasKey('environment', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('environment');
         $expected = [
             'description' => 'Environment variables',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['environment']);
+        Assert::equals($result['properties']['environment'], $expected);
 
         // Check that ServiceEndpoint definition is included
-        $this->assertArrayHasKey('definitions', $result);
-        $this->assertArrayHasKey('ServiceEndpoint', $result['definitions']);
+        Assert::array($result)->hasKeys('definitions');
+        Assert::array($result['definitions'])->hasKeys('ServiceEndpoint');
 
         $serviceEndpointDef = $result['definitions']['ServiceEndpoint'];
-        $this->assertEquals('object', $serviceEndpointDef['type']);
-        $this->assertArrayHasKey('properties', $serviceEndpointDef);
-        $this->assertArrayHasKey('url', $serviceEndpointDef['properties']);
-        $this->assertArrayHasKey('timeoutMs', $serviceEndpointDef['properties']);
-        $this->assertArrayHasKey('maxRetries', $serviceEndpointDef['properties']);
-        $this->assertArrayHasKey('enabled', $serviceEndpointDef['properties']);
+        Assert::equals($serviceEndpointDef['type'], 'object');
+        Assert::array($serviceEndpointDef)->hasKeys('properties');
+        Assert::array($serviceEndpointDef['properties'])->hasKeys('url');
+        Assert::array($serviceEndpointDef['properties'])->hasKeys('timeoutMs');
+        Assert::array($serviceEndpointDef['properties'])->hasKeys('maxRetries');
+        Assert::array($serviceEndpointDef['properties'])->hasKeys('enabled');
 
         // Check required properties for main object
-        $this->assertArrayHasKey('required', $result);
-        $this->assertContains('serviceName', $result['required']);
-        $this->assertContains('version', $result['required']);
+        Assert::array($result)->hasKeys('required');
+        Assert::contains($result['required'], 'serviceName');
+        Assert::contains($result['required'], 'version');
 
         // Check required properties for ServiceEndpoint
-        $this->assertArrayHasKey('required', $serviceEndpointDef);
-        $this->assertContains('url', $serviceEndpointDef['required']);
-        $this->assertContains('timeoutMs', $serviceEndpointDef['required']);
-        $this->assertContains('maxRetries', $serviceEndpointDef['required']);
-        $this->assertContains('enabled', $serviceEndpointDef['required']);
+        Assert::array($serviceEndpointDef)->hasKeys('required');
+        Assert::contains($serviceEndpointDef['required'], 'url');
+        Assert::contains($serviceEndpointDef['required'], 'timeoutMs');
+        Assert::contains($serviceEndpointDef['required'], 'maxRetries');
+        Assert::contains($serviceEndpointDef['required'], 'enabled');
     }
 
     public function testAdditionalPropertiesWithOtherConstraints(): void
@@ -143,18 +145,9 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Verify that Field descriptions are preserved along with additionalProperties
-        $this->assertEquals(
-            'String-based configuration options',
-            $result['properties']['stringOptions']['description'],
-        );
-        $this->assertEquals(
-            'Numeric configuration values',
-            $result['properties']['numericSettings']['description'],
-        );
-        $this->assertEquals(
-            'Dynamic data of any type',
-            $result['properties']['dynamicData']['description'],
-        );
+        Assert::equals($result['properties']['stringOptions']['description'], 'String-based configuration options');
+        Assert::equals($result['properties']['numericSettings']['description'], 'Numeric configuration values');
+        Assert::equals($result['properties']['dynamicData']['description'], 'Dynamic data of any type');
     }
 
     public function testDatabaseConfigurationExample(): void
@@ -164,18 +157,18 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test basic properties
-        $this->assertEquals('string', $result['properties']['host']['type']);
-        $this->assertEquals('integer', $result['properties']['port']['type']);
+        Assert::equals($result['properties']['host']['type'], 'string');
+        Assert::equals($result['properties']['port']['type'], 'integer');
 
         // Test additional properties with string type
-        $this->assertArrayHasKey('driverOptions', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('driverOptions');
         $expected = [
             'description' => 'Driver-specific configuration options',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['driverOptions']);
+        Assert::equals($result['properties']['driverOptions'], $expected);
     }
 
     public function testUserManagementExample(): void
@@ -185,24 +178,24 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test mixed type additional properties
-        $this->assertArrayHasKey('attributes', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('attributes');
         $expected = [
             'description' => 'Custom user attributes and metadata',
             'type' => 'object',
             'additionalProperties' => true, // mixed type becomes true
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['attributes']);
+        Assert::equals($result['properties']['attributes'], $expected);
 
         // Test string additional properties
-        $this->assertArrayHasKey('preferences', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('preferences');
         $expected = [
             'description' => 'User preferences',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['preferences']);
+        Assert::equals($result['properties']['preferences'], $expected);
     }
 
     public function testLocalizationExample(): void
@@ -212,28 +205,28 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test string additional properties for translations
-        $this->assertArrayHasKey('translations', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('translations');
         $expected = [
             'description' => 'Translations for different locales',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['translations']);
+        Assert::equals($result['properties']['translations'], $expected);
 
         // Test object additional properties with class reference
-        $this->assertArrayHasKey('localeMetadata', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('localeMetadata');
         $expected = [
             'description' => 'Locale-specific metadata',
             'type' => 'object',
             'additionalProperties' => ['$ref' => '#/definitions/LocaleMetadata'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['localeMetadata']);
+        Assert::equals($result['properties']['localeMetadata'], $expected);
 
         // Verify LocaleMetadata definition is included
-        $this->assertArrayHasKey('definitions', $result);
-        $this->assertArrayHasKey('LocaleMetadata', $result['definitions']);
+        Assert::array($result)->hasKeys('definitions');
+        Assert::array($result['definitions'])->hasKeys('LocaleMetadata');
     }
 
     public function testApiResponseExample(): void
@@ -243,24 +236,24 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test mixed additional properties for dynamic data
-        $this->assertArrayHasKey('data', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('data');
         $expected = [
             'description' => 'Dynamic response data',
             'type' => 'object',
             'additionalProperties' => true,
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['data']);
+        Assert::equals($result['properties']['data'], $expected);
 
         // Test string additional properties for headers
-        $this->assertArrayHasKey('headers', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('headers');
         $expected = [
             'description' => 'Response headers',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['headers']);
+        Assert::equals($result['properties']['headers'], $expected);
     }
 
     public function testEcommerceProductExample(): void
@@ -270,28 +263,28 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Test price has Range constraint
-        $this->assertArrayHasKey('minimum', $result['properties']['price']);
-        $this->assertEquals(0, $result['properties']['price']['minimum']);
+        Assert::array($result['properties']['price'])->hasKeys('minimum');
+        Assert::equals($result['properties']['price']['minimum'], 0);
 
         // Test mixed additional properties for attributes
-        $this->assertArrayHasKey('attributes', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('attributes');
         $expected = [
             'description' => 'Product-specific attributes that vary by category',
             'type' => 'object',
             'additionalProperties' => true,
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['attributes']);
+        Assert::equals($result['properties']['attributes'], $expected);
 
         // Test string additional properties for metadata
-        $this->assertArrayHasKey('metadata', $result['properties']);
+        Assert::array($result['properties'])->hasKeys('metadata');
         $expected = [
             'description' => 'SEO and marketing metadata',
             'type' => 'object',
             'additionalProperties' => ['type' => 'string'],
             'default' => [],
         ];
-        $this->assertEquals($expected, $result['properties']['metadata']);
+        Assert::equals($result['properties']['metadata'], $expected);
     }
 
     public function testAdditionalPropertiesIntegrationWithExistingConstraints(): void
@@ -302,20 +295,17 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Verify that Field descriptions are preserved
-        $this->assertEquals(
-            'Product-specific attributes that vary by category',
-            $result['properties']['attributes']['description'],
-        );
+        Assert::equals($result['properties']['attributes']['description'], 'Product-specific attributes that vary by category');
 
         // Verify that Range constraints are preserved on other fields
-        $this->assertEquals(0, $result['properties']['price']['minimum']);
+        Assert::equals($result['properties']['price']['minimum'], 0);
 
         // Verify that required properties work correctly
-        $this->assertContains('id', $result['required']);
-        $this->assertContains('name', $result['required']);
-        $this->assertContains('price', $result['required']);
-        $this->assertNotContains('attributes', $result['required']); // has default value
-        $this->assertNotContains('metadata', $result['required']); // has default value
+        Assert::contains($result['required'], 'id');
+        Assert::contains($result['required'], 'name');
+        Assert::contains($result['required'], 'price');
+        Assert::iterable($result['required'])->notContains('attributes'); // has default value
+        Assert::iterable($result['required'])->notContains('metadata'); // has default value
     }
 
     public function testTypeAlternatives(): void
@@ -337,12 +327,12 @@ final class AdditionalPropertiesIntegrationTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // integer should map to JSON schema 'integer'
-        $this->assertEquals(['type' => 'integer'], $result['properties']['integers']['additionalProperties']);
+        Assert::equals($result['properties']['integers']['additionalProperties'], ['type' => 'integer']);
 
         // float should map to JSON schema 'number'
-        $this->assertEquals(['type' => 'number'], $result['properties']['floats']['additionalProperties']);
+        Assert::equals($result['properties']['floats']['additionalProperties'], ['type' => 'number']);
 
         // bool should map to JSON schema 'boolean'
-        $this->assertEquals(['type' => 'boolean'], $result['properties']['booleans']['additionalProperties']);
+        Assert::equals($result['properties']['booleans']['additionalProperties'], ['type' => 'boolean']);
     }
 }

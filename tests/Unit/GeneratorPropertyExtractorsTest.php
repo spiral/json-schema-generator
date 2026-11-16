@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\UserWithConstraints;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ValidatedUser;
 use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
 use Spiral\JsonSchemaGenerator\Validation\PhpDocValidationConstraintExtractor;
+use Testo\Assert;
+use Testo\Test;
 
-final class GeneratorPropertyExtractorsTest extends TestCase
+#[Test]
+final class GeneratorPropertyExtractorsTest
 {
     public function testCreateDefault(): void
     {
@@ -21,14 +23,14 @@ final class GeneratorPropertyExtractorsTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Should have both attribute and PHPDoc-based constraints
-        $this->assertArrayHasKey('properties', $result);
-        $this->assertArrayHasKey('age', $result['properties']);
+        Assert::array($result)->hasKeys('properties');
+        Assert::array($result['properties'])->hasKeys('age');
 
         // Age should have range constraint from attribute
-        $this->assertArrayHasKey('minimum', $result['properties']['age']);
-        $this->assertArrayHasKey('maximum', $result['properties']['age']);
-        $this->assertEquals(13, $result['properties']['age']['minimum']);
-        $this->assertEquals(120, $result['properties']['age']['maximum']);
+        Assert::array($result['properties']['age'])->hasKeys('minimum');
+        Assert::array($result['properties']['age'])->hasKeys('maximum');
+        Assert::equals($result['properties']['age']['minimum'], 13);
+        Assert::equals($result['properties']['age']['maximum'], 120);
     }
 
     public function testCreateWithValidationOnly(): void
@@ -40,12 +42,12 @@ final class GeneratorPropertyExtractorsTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Should have PHPDoc-based constraints but not attribute constraints
-        $this->assertArrayHasKey('minimum', $result['properties']['age']);
-        $this->assertEquals(1, $result['properties']['age']['minimum']); // from positive-int
+        Assert::array($result['properties']['age'])->hasKeys('minimum');
+        Assert::equals($result['properties']['age']['minimum'], 1); // from positive-int
 
         // Should have minLength from non-empty-string
-        $this->assertArrayHasKey('minLength', $result['properties']['name']);
-        $this->assertEquals(1, $result['properties']['name']['minLength']);
+        Assert::array($result['properties']['name'])->hasKeys('minLength');
+        Assert::equals($result['properties']['name']['minLength'], 1);
     }
 
     public function testCreateWithAttributesOnly(): void
@@ -58,12 +60,12 @@ final class GeneratorPropertyExtractorsTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Should have attribute-based constraints
-        $this->assertArrayHasKey('minimum', $result['properties']['age']);
-        $this->assertEquals(13, $result['properties']['age']['minimum']);
+        Assert::array($result['properties']['age'])->hasKeys('minimum');
+        Assert::equals($result['properties']['age']['minimum'], 13);
 
         // Should have pattern from Pattern attribute
-        $this->assertArrayHasKey('pattern', $result['properties']['name']);
-        $this->assertEquals('^[A-Z][a-z]+(?: [A-Z][a-z]+)*$', $result['properties']['name']['pattern']);
+        Assert::array($result['properties']['name'])->hasKeys('pattern');
+        Assert::equals($result['properties']['name']['pattern'], '^[A-Z][a-z]+(?: [A-Z][a-z]+)*$');
     }
 
     public function testCreateWithoutValidation(): void
@@ -74,15 +76,15 @@ final class GeneratorPropertyExtractorsTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Should not have any validation constraints
-        $this->assertArrayNotHasKey('minimum', $result['properties']['age']);
-        $this->assertArrayNotHasKey('maximum', $result['properties']['age']);
-        $this->assertArrayNotHasKey('pattern', $result['properties']['name']);
-        $this->assertArrayNotHasKey('minLength', $result['properties']['name']);
-        $this->assertArrayNotHasKey('maxLength', $result['properties']['name']);
+        Assert::array($result['properties']['age'])->doesNotHaveKeys('minimum');
+        Assert::array($result['properties']['age'])->doesNotHaveKeys('maximum');
+        Assert::array($result['properties']['name'])->doesNotHaveKeys('pattern');
+        Assert::array($result['properties']['name'])->doesNotHaveKeys('minLength');
+        Assert::array($result['properties']['name'])->doesNotHaveKeys('maxLength');
 
         // But should still have basic type information
-        $this->assertEquals('integer', $result['properties']['age']['type']);
-        $this->assertEquals('string', $result['properties']['name']['type']);
+        Assert::equals($result['properties']['age']['type'], 'integer');
+        Assert::equals($result['properties']['name']['type'], 'string');
     }
 
     public function testBackwardCompatibility(): void
@@ -93,7 +95,7 @@ final class GeneratorPropertyExtractorsTest extends TestCase
         $result = $schema->jsonSerialize();
 
         // Should have validation constraints (backward compatible)
-        $this->assertArrayHasKey('minimum', $result['properties']['age']);
-        $this->assertEquals(1, $result['properties']['age']['minimum']);
+        Assert::array($result['properties']['age'])->hasKeys('minimum');
+        Assert::equals($result['properties']['age']['minimum'], 1);
     }
 }
