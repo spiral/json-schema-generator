@@ -75,7 +75,7 @@ final class ValidationIntegrationTest
             ],
             'required' => ['theme', 'notifications'],
             'additionalProperties' => false, // from array shape constraint
-            'default' => [], // from default value in constructor
+            'default' => new \stdClass(), // from default value in constructor
         ];
 
         Assert::equals($result['properties']['preferences'], $preferencesExpected);

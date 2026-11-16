@@ -51,6 +51,11 @@ final readonly class Property implements \JsonSerializable
             // Clean up internal metadata keys
             unset($property['_additionalPropertiesClass']);
 
+            // An empty PHP array default would serialize as the JSON array `[]`, not an object.
+            if (\array_key_exists('default', $property) && $property['default'] === []) {
+                $property['default'] = new \stdClass();
+            }
+
             return $property;
         }
 
