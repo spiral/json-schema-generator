@@ -7,7 +7,6 @@ namespace Spiral\JsonSchemaGenerator\Tests\Unit\Validation;
 use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\PhpDocConstraints;
 use Testo\Assert;
-use Testo\Skip;
 use Testo\Test;
 
 #[Test]
@@ -18,13 +17,11 @@ final class PhpDocConstraintsTest
         Assert::same(self::property('negative'), ['type' => 'integer', 'maximum' => -1]);
     }
 
-    #[Skip('non-positive-int also matches positive-int, see https://github.com/spiral/json-schema-generator/issues/38')]
     public function testNonPositiveInt(): void
     {
         Assert::same(self::property('nonPositive'), ['type' => 'integer', 'maximum' => 0]);
     }
 
-    #[Skip('non-negative-int also matches negative-int, see https://github.com/spiral/json-schema-generator/issues/38')]
     public function testNonNegativeInt(): void
     {
         Assert::same(self::property('nonNegative'), ['type' => 'integer', 'minimum' => 0]);

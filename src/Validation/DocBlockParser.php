@@ -45,7 +45,8 @@ final class DocBlockParser
         ];
 
         foreach ($simpleConstraints as $constraint) {
-            if (\str_contains($type, $constraint)) {
+            // Whole tokens only: `non-positive-int` must not also match `positive-int`.
+            if (\preg_match('/(?<![\w-])' . \preg_quote($constraint, '/') . '(?![\w-])/', $type) === 1) {
                 $constraints[] = $constraint;
             }
         }
