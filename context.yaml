@@ -5,7 +5,7 @@ tools:
     description: 'Run tests'
     type: run
     commands:
-      - cmd: vendor/bin/phpunit
+      - cmd: vendor/bin/testo
 
 documents:
   - description: 'Project structure overview'

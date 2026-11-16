@@ -9,6 +9,7 @@ namespace Spiral\JsonSchemaGenerator\Validation\Constraint;
  */
 final class NumericConstraint extends AbstractConstraint
 {
+    #[\Override]
     public function toJsonSchema(): array
     {
         return match ($this->type) {
@@ -21,13 +22,18 @@ final class NumericConstraint extends AbstractConstraint
         };
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function parseIntRange(): array
     {
         if (!\is_array($this->value) || \count($this->value) !== 2) {
             return [];
         }
 
-        [$min, $max] = $this->value;
+        /** @var list{string, string} $range */
+        $range = $this->value;
+        [$min, $max] = $range;
         $schema = [];
 
         if ($min !== 'min' && \is_numeric($min)) {

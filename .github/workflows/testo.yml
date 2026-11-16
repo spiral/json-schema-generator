@@ -1,0 +1,36 @@
+on:
+  pull_request: null
+  push:
+    branches:
+      - '2.x'
+
+name: testo
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  testo:
+    uses: spiral/gh-actions/.github/workflows/testo.yml@master
+    with:
+      os: >-
+        ['ubuntu-latest']
+      php: >-
+        ['8.3', '8.4', '8.5', '8.6']
+      dependencies: >-
+        ['lowest', 'highest']
+
+  coverage:
+    uses: spiral/gh-actions/.github/workflows/testo.yml@master
+    with:
+      os: >-
+        ['ubuntu-latest']
+      php: >-
+        ['8.4']
+      codecov: true
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

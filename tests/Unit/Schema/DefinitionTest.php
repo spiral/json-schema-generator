@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Exception\DefinitionException;
 use Spiral\JsonSchemaGenerator\Schema\Definition;
 use Spiral\JsonSchemaGenerator\Schema\Property;
@@ -12,9 +11,14 @@ use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\InvalidEnum;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Priority;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\ReleaseStatus;
+use Testo\Assert;
+use Testo\Assert\ExpectException;
+use Testo\Test;
 
-final class DefinitionTest extends TestCase
+#[Test]
+final class DefinitionTest
 {
     public function testClassDefinition(): void
     {
@@ -36,7 +40,7 @@ final class DefinitionTest extends TestCase
             ],
         );
 
-        $this->assertEquals([
+        Assert::equals($definition->jsonSerialize(), [
             'type' => 'object',
             'properties' => [
                 'title' => [
@@ -60,7 +64,7 @@ final class DefinitionTest extends TestCase
                 'title',
                 'status',
             ],
-        ], $definition->jsonSerialize());
+        ]);
     }
 
     public function testEnumDefinition(): void
@@ -74,7 +78,7 @@ final class DefinitionTest extends TestCase
             title: 'status',
         );
 
-        $this->assertEquals([
+        Assert::equals($definition->jsonSerialize(), [
             'title' => 'status',
             'type' => 'string',
             'enum' => [
@@ -85,24 +89,46 @@ final class DefinitionTest extends TestCase
                 'Planned',
                 'Canceled',
             ],
-        ], $definition->jsonSerialize());
+        ]);
     }
 
+    #[ExpectException(DefinitionException::class)]
     public function testInvalidPropertyException(): void
     {
-        $this->expectException(DefinitionException::class);
         new Definition(type: Movie::class, properties: ['foo']);
     }
 
+    #[ExpectException(DefinitionException::class)]
     public function testInvalidClassException(): void
     {
-        $this->expectException(DefinitionException::class);
         (new Definition(type: \stdClass::class))->jsonSerialize();
     }
 
+    #[ExpectException(DefinitionException::class)]
     public function testInvalidEnumException(): void
     {
-        $this->expectException(DefinitionException::class);
         (new Definition(type: InvalidEnum::class))->jsonSerialize();
+    }
+
+    public function testIntBackedEnumDefinition(): void
+    {
+        $definition = new Definition(
+            type: Priority::class,
+            options: [1, 2],
+            title: 'Priority',
+            description: 'Task priority',
+        );
+
+        Assert::same($definition->jsonSerialize(), [
+            'title' => 'Priority',
+            'description' => 'Task priority',
+            'type' => 'number',
+            'enum' => [1, 2],
+        ]);
+    }
+
+    public function testSimpleTypeDefinition(): void
+    {
+        Assert::same((new Definition(type: Type::String))->jsonSerialize(), ['type' => 'string']);
     }
 }

@@ -9,6 +9,7 @@ namespace Spiral\JsonSchemaGenerator\Validation\Constraint;
  */
 final class ArrayConstraint extends AbstractConstraint
 {
+    #[\Override]
     public function toJsonSchema(): array
     {
         return match ($this->type) {
@@ -18,6 +19,9 @@ final class ArrayConstraint extends AbstractConstraint
         };
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function parseArrayShape(): array
     {
         if (!\is_array($this->value)) {
@@ -27,7 +31,16 @@ final class ArrayConstraint extends AbstractConstraint
         $properties = [];
         $required = [];
 
-        foreach ($this->value as $key => $spec) {
+        /** @var array<array-key, string> $shape */
+        $shape = $this->value;
+
+        // A tuple shape (`array{0: string, 1: int}`) cannot become an object schema:
+        // PHP turns the numeric keys back into a list, which serializes as a JSON array.
+        foreach ($shape as $key => $spec) {
+            if (\is_int($key)) {
+                return [];
+            }
+
             $isOptional = \str_ends_with($key, '?');
             $cleanKey = $isOptional ? \rtrim($key, '?') : $key;
 

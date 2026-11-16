@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Parser;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\Field;
 use Spiral\JsonSchemaGenerator\Parser\Property;
 use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Testo\Assert;
+use Testo\Test;
 
-final class PropertyTest extends TestCase
+#[Test]
+final class PropertyTest
 {
     public function testGetName(): void
     {
@@ -21,7 +23,7 @@ final class PropertyTest extends TestCase
             hasDefaultValue: false,
         );
 
-        $this->assertSame('title', $property->getName());
+        Assert::same($property->getName(), 'title');
     }
 
     public function testFindAttribute(): void
@@ -32,10 +34,7 @@ final class PropertyTest extends TestCase
             hasDefaultValue: false,
         );
 
-        $this->assertEquals(
-            new Field(title: 'Title', description: 'The title of the movie'),
-            $property->findAttribute(name: Field::class),
-        );
+        Assert::equals($property->findAttribute(name: Field::class), new Field(title: 'Title', description: 'The title of the movie'));
     }
 
     public function testHasDefaultValue(): void
@@ -45,14 +44,14 @@ final class PropertyTest extends TestCase
             type: new Type([]),
             hasDefaultValue: true,
         );
-        $this->assertTrue($property->hasDefaultValue());
+        Assert::true($property->hasDefaultValue());
 
         $property = new Property(
             property: new \ReflectionProperty(Movie::class, 'description'),
             type: new Type([]),
             hasDefaultValue: false,
         );
-        $this->assertFalse($property->hasDefaultValue());
+        Assert::false($property->hasDefaultValue());
     }
 
     public function testGetDefaultValue(): void
@@ -62,7 +61,7 @@ final class PropertyTest extends TestCase
             type: new Type([]),
             hasDefaultValue: true,
         );
-        $this->assertNull($property->getDefaultValue());
+        Assert::null($property->getDefaultValue());
 
         $property = new Property(
             property: new \ReflectionProperty(Movie::class, 'description'),
@@ -70,7 +69,7 @@ final class PropertyTest extends TestCase
             hasDefaultValue: true,
             defaultValue: 'foo',
         );
-        $this->assertSame('foo', $property->getDefaultValue());
+        Assert::same($property->getDefaultValue(), 'foo');
     }
 
     public function testIsCollection(): void
@@ -80,22 +79,22 @@ final class PropertyTest extends TestCase
             type: new Type(types: [new SimpleType(name: 'string', builtin: true)]),
             hasDefaultValue: true,
         );
-        $this->assertFalse($property->getType()->types[0]->isCollection());
+        Assert::false($property->getType()->types[0]->isCollection());
 
         $property = new Property(
             property: new \ReflectionProperty(Movie::class, 'description'),
             type: new Type(types: [new SimpleType(name: Movie::class, builtin: false)]),
             hasDefaultValue: true,
         );
-        $this->assertFalse($property->getType()->types[0]->isCollection());
+        Assert::false($property->getType()->types[0]->isCollection());
 
         $property = new Property(
             property: new \ReflectionProperty(class: Movie::class, property: 'description'),
             type: new Type(types: [new SimpleType(name: 'array', builtin: true, collectionType: new Type(types: [new SimpleType(name: 'string', builtin: true)]))]),
             hasDefaultValue: true,
         );
-        $this->assertTrue($property->getType()->types[0]->isCollection());
-        $this->assertEquals('string', $property->getType()->types[0]->getCollectionType()?->types[0]?->getName()->value);
+        Assert::true($property->getType()->types[0]->isCollection());
+        Assert::equals($property->getType()->types[0]->getCollectionType()?->types[0]?->getName()->value, 'string');
     }
 
     public function testGetType(): void
@@ -105,6 +104,6 @@ final class PropertyTest extends TestCase
             type: new Type(types: [new SimpleType(name: Movie::class, builtin: false)]),
             hasDefaultValue: true,
         );
-        $this->assertEquals(new SimpleType(name: Movie::class, builtin: false), $property->getType()->types[0]);
+        Assert::equals($property->getType()->types[0], new SimpleType(name: Movie::class, builtin: false));
     }
 }

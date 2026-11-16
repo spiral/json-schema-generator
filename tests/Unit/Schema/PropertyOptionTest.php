@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Exception\InvalidTypeException;
 use Spiral\JsonSchemaGenerator\Schema\PropertyOption;
+use Testo\Assert\ExpectException;
+use Testo\Test;
 
-final class PropertyOptionTest extends TestCase
+#[Test]
+final class PropertyOptionTest
 {
+    #[ExpectException(InvalidTypeException::class)]
     public function testInvalidValueException(): void
     {
-        $this->expectException(InvalidTypeException::class);
         new PropertyOption(value: 'invalid');
     }
 }

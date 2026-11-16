@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Validation;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Parser\Property;
 use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 use Spiral\JsonSchemaGenerator\Validation\AttributeConstraintExtractor;
 use Spiral\JsonSchemaGenerator\Validation\CompositePropertyDataExtractor;
+use Testo\Assert;
+use Testo\Test;
 
-final class CompositePropertyDataExtractorTest extends TestCase
+#[Test]
+final class CompositePropertyDataExtractorTest
 {
     public function testCreateDefault(): void
     {
         $extractor = CompositePropertyDataExtractor::createDefault();
 
-        $this->assertInstanceOf(CompositePropertyDataExtractor::class, $extractor);
+        Assert::instanceOf($extractor, CompositePropertyDataExtractor::class);
 
         // Test that both extractors work by using a property with both attribute and PHPDoc constraints
         $testClass = new class {
@@ -37,10 +39,10 @@ final class CompositePropertyDataExtractorTest extends TestCase
         $rules = $extractor->extractValidationRules($propertyWrapper, SchemaType::Integer);
 
         // Should have constraints from both extractors
-        $this->assertArrayHasKey('minimum', $rules);
-        $this->assertEquals(1, $rules['minimum']); // From both attribute and PHPDoc
-        $this->assertArrayHasKey('maximum', $rules);
-        $this->assertEquals(100, $rules['maximum']); // From attribute
+        Assert::array($rules)->hasKeys('minimum');
+        Assert::equals($rules['minimum'], 1); // From both attribute and PHPDoc
+        Assert::array($rules)->hasKeys('maximum');
+        Assert::equals($rules['maximum'], 100); // From attribute
     }
 
     public function testWithExtractor(): void
@@ -62,6 +64,6 @@ final class CompositePropertyDataExtractorTest extends TestCase
 
         $rules = $extractor->extractValidationRules($propertyWrapper, SchemaType::Integer);
 
-        $this->assertEquals(['minimum' => 5, 'maximum' => 50], $rules);
+        Assert::equals($rules, ['minimum' => 5, 'maximum' => 50]);
     }
 }

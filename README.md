@@ -2,8 +2,10 @@
 
 [![PHP Version Require](https://poser.pugx.org/spiral/json-schema-generator/require/php)](https://packagist.org/packages/spiral/json-schema-generator)
 [![Latest Stable Version](https://poser.pugx.org/spiral/json-schema-generator/v/stable)](https://packagist.org/packages/spiral/json-schema-generator)
-[![phpunit](https://github.com/spiral/json-schema-generator/actions/workflows/phpunit.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
+[![testo](https://github.com/spiral/json-schema-generator/actions/workflows/testo.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
 [![psalm](https://github.com/spiral/json-schema-generator/actions/workflows/psalm.yml/badge.svg)](https://github.com/spiral/json-schema-generator/actions)
+[![Codecov](https://codecov.io/gh/spiral/json-schema-generator/branch/2.x/graph/badge.svg)](https://codecov.io/gh/spiral/json-schema-generator)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fspiral%2Fjson-schema-generator%2F2.x)](https://dashboard.stryker-mutator.io/reports/github.com/spiral/json-schema-generator/2.x)
 [![Total Downloads](https://poser.pugx.org/spiral/json-schema-generator/downloads)](https://packagist.org/packages/spiral/json-schema-generator)
 [![psalm-level](https://shepherd.dev/github/spiral/json-schema-generator/level.svg)](https://shepherd.dev/github/spiral/json-schema-generator)
 
@@ -1201,7 +1203,7 @@ composer test
 
 ## Contributing
 
-Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](https://github.com/spiral/.github/blob/main/.github/CONTRIBUTING.md) for details.
 
 ## License
 

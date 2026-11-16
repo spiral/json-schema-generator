@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Validation;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\AdditionalProperties;
 use Spiral\JsonSchemaGenerator\Parser\Property;
 use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Schema\Type as SchemaType;
 use Spiral\JsonSchemaGenerator\Validation\AdditionalPropertiesExtractor;
+use Testo\Assert;
+use Testo\Lifecycle\BeforeTest;
+use Testo\Test;
 
-final class AdditionalPropertiesExtractorTest extends TestCase
+#[Test]
+final class AdditionalPropertiesExtractorTest
 {
     private AdditionalPropertiesExtractor $extractor;
 
@@ -38,7 +41,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
             'additionalProperties' => ['type' => 'string'],
         ];
 
-        $this->assertEquals($expected, $rules);
+        Assert::equals($rules, $expected);
     }
 
     public function testExtractAdditionalPropertiesWithIntegerType(): void
@@ -63,7 +66,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
             'additionalProperties' => ['type' => 'integer'],
         ];
 
-        $this->assertEquals($expected, $rules);
+        Assert::equals($rules, $expected);
     }
 
     public function testExtractAdditionalPropertiesWithNumberType(): void
@@ -88,7 +91,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
             'additionalProperties' => ['type' => 'number'],
         ];
 
-        $this->assertEquals($expected, $rules);
+        Assert::equals($rules, $expected);
     }
 
     public function testExtractAdditionalPropertiesWithBooleanType(): void
@@ -113,7 +116,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
             'additionalProperties' => ['type' => 'boolean'],
         ];
 
-        $this->assertEquals($expected, $rules);
+        Assert::equals($rules, $expected);
     }
 
     public function testExtractAdditionalPropertiesWithMixedType(): void
@@ -138,7 +141,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
             'additionalProperties' => true,
         ];
 
-        $this->assertEquals($expected, $rules);
+        Assert::equals($rules, $expected);
     }
 
     public function testExtractAdditionalPropertiesWithObjectType(): void
@@ -164,7 +167,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
             '_additionalPropertiesClass' => \stdClass::class, // Include the internal metadata
         ];
 
-        $this->assertEquals($expected, $rules);
+        Assert::equals($rules, $expected);
     }
 
     public function testExtractAdditionalPropertiesIgnoredForNonArrayTypes(): void
@@ -183,7 +186,7 @@ final class AdditionalPropertiesExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::String);
 
-        $this->assertEquals([], $rules);
+        Assert::equals($rules, []);
     }
 
     public function testExtractAdditionalPropertiesNotPresent(): void
@@ -202,9 +205,10 @@ final class AdditionalPropertiesExtractorTest extends TestCase
 
         $rules = $this->extractor->extractValidationRules($propertyWrapper, SchemaType::Array);
 
-        $this->assertEquals([], $rules);
+        Assert::equals($rules, []);
     }
 
+    #[BeforeTest]
     protected function setUp(): void
     {
         $this->extractor = new AdditionalPropertiesExtractor();

@@ -4,43 +4,45 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Attribute\Constraint;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Attribute\Constraint\MultipleOf;
+use Testo\Assert;
+use Testo\Test;
 
-final class MultipleOfTest extends TestCase
+#[Test]
+final class MultipleOfTest
 {
     public function testMultipleOfWithInteger(): void
     {
         $multipleOf = new MultipleOf(5);
 
-        $this->assertSame(5, $multipleOf->value);
+        Assert::same($multipleOf->value, 5);
     }
 
     public function testMultipleOfWithFloat(): void
     {
         $multipleOf = new MultipleOf(0.01);
 
-        $this->assertSame(0.01, $multipleOf->value);
+        Assert::same($multipleOf->value, 0.01);
     }
 
     public function testMultipleOfWithLargeNumber(): void
     {
         $multipleOf = new MultipleOf(1000000);
 
-        $this->assertSame(1000000, $multipleOf->value);
+        Assert::same($multipleOf->value, 1000000);
     }
 
     public function testMultipleOfWithDecimal(): void
     {
         $multipleOf = new MultipleOf(2.5);
 
-        $this->assertSame(2.5, $multipleOf->value);
+        Assert::same($multipleOf->value, 2.5);
     }
 
     public function testMultipleOfWithSmallDecimal(): void
     {
         $multipleOf = new MultipleOf(0.001);
 
-        $this->assertSame(0.001, $multipleOf->value);
+        Assert::same($multipleOf->value, 0.001);
     }
 }

@@ -33,16 +33,19 @@ final class PropertyOptions implements \Countable, \ArrayAccess, \JsonSerializab
         return $this->options;
     }
 
+    #[\Override]
     public function count(): int
     {
         return \count($this->options);
     }
 
+    #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->options[$offset]);
     }
 
+    #[\Override]
     public function offsetGet(mixed $offset): PropertyOption
     {
         return $this->options[$offset];
@@ -52,16 +55,19 @@ final class PropertyOptions implements \Countable, \ArrayAccess, \JsonSerializab
      * @param int $offset
      * @param PropertyOption|class-string|Type $value
      */
+    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->options[$offset] = $value instanceof PropertyOption ? $value : new PropertyOption($value);
     }
 
+    #[\Override]
     public function offsetUnset(mixed $offset): void
     {
         unset($this->options[$offset]);
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $types = [];

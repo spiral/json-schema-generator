@@ -14,6 +14,9 @@ abstract class AbstractConstraint
         protected readonly mixed $value = null,
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     abstract public function toJsonSchema(): array;
 
     public function getType(): string

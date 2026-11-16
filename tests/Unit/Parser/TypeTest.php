@@ -4,37 +4,39 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Parser;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Parser\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Testo\Assert;
+use Testo\Test;
 
-final class TypeTest extends TestCase
+#[Test]
+final class TypeTest
 {
     public function testGetName(): void
     {
         $type = new SimpleType(name: 'string', builtin: true);
-        $this->assertSame(\Spiral\JsonSchemaGenerator\Schema\Type::String, $type->getName());
+        Assert::same($type->getName(), \Spiral\JsonSchemaGenerator\Schema\Type::String);
 
         $type = new SimpleType(name: Movie::class, builtin: false);
-        $this->assertSame(Movie::class, $type->getName());
+        Assert::same($type->getName(), Movie::class);
     }
 
     public function testIsBuiltin(): void
     {
         $type = new SimpleType(name: 'string', builtin: true);
-        $this->assertTrue($type->isBuiltin());
+        Assert::true($type->isBuiltin());
 
         $type = new SimpleType(name: Movie::class, builtin: false);
-        $this->assertFalse($type->isBuiltin());
+        Assert::false($type->isBuiltin());
     }
 
     public function testAllowsNull(): void
     {
         $type = new Type(types: [new SimpleType(name: 'null', builtin: true), new SimpleType(name: 'string', builtin: true)]);
-        $this->assertTrue($type->allowsNull());
+        Assert::true($type->allowsNull());
 
         $type = new Type(types: [new SimpleType(name: Movie::class, builtin: false)]);
-        $this->assertFalse($type->allowsNull());
+        Assert::false($type->allowsNull());
     }
 }

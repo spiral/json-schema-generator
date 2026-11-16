@@ -1,7 +1,21 @@
 {
   "name": "spiral/json-schema-generator",
   "description": "Provides the ability to generate JSON schemas from Data Transfer Object (DTO) classes",
-  "keywords": [],
+  "keywords": [
+    "json-schema",
+    "json-schema-generator",
+    "schema",
+    "dto",
+    "data-transfer-object",
+    "llm",
+    "ai",
+    "openai",
+    "structured-output",
+    "function-calling",
+    "tool-calling",
+    "attributes",
+    "spiral"
+  ],
   "homepage": "https://github.com/spiral/json-schema-generator",
   "license": "MIT",
   "authors": [
@@ -29,10 +43,10 @@
     "phpdocumentor/reflection-docblock": "^5.3 || ^6.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5.45",
-    "spiral/code-style": "^2.2.2",
-    "vimeo/psalm": "^6.10",
-    "rector/rector": "^2.0"
+    "bamarni/composer-bin-plugin": "^1.8",
+    "rector/rector": "^2.0",
+    "testo/bridge-infection": "^0.1.9",
+    "testo/testo": "^0.10.56"
   },
   "autoload": {
     "psr-4": {
@@ -45,16 +59,35 @@
     }
   },
   "scripts": {
-    "cs:fix": "php-cs-fixer fix -v",
-    "psalm": "psalm",
+    "cs:diff": "php-cs-fixer fix --dry-run -v --diff --config=vendor-bin/code-style/.php-cs-fixer.dist.php",
+    "cs:fix": "php-cs-fixer fix -v --config=vendor-bin/code-style/.php-cs-fixer.dist.php",
+    "infect": [
+      "@putenv XDEBUG_MODE=coverage",
+      "infection --threads=max --min-msi=80 --min-covered-msi=80"
+    ],
+    "infect:ci": [
+      "@putenv XDEBUG_MODE=coverage",
+      "infection --ansi --threads=max --logger-github --show-mutations=0 --min-msi=80 --min-covered-msi=80"
+    ],
+    "psalm": "psalm -c vendor-bin/psalm/psalm.xml",
+    "psalm:baseline": "psalm -c vendor-bin/psalm/psalm.xml --set-baseline=vendor-bin/psalm/psalm-baseline.xml",
+    "psalm:ci": "psalm -c vendor-bin/psalm/psalm.xml --output-format=github --shepherd --show-info=false --stats --threads=4",
     "refactor": "rector process --config=rector.php",
     "refactor:ci": "rector process --config=rector.php --dry-run --ansi",
-    "test": "phpunit",
-    "test-coverage": "phpunit --coverage",
-    "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml"
+    "test": "testo"
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "bamarni/composer-bin-plugin": true
+    }
+  },
+  "extra": {
+    "bamarni-bin": {
+      "bin-links": true,
+      "forward-command": false,
+      "target-directory": "vendor-bin"
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true

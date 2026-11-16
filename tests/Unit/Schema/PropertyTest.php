@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\JsonSchemaGenerator\Tests\Unit\Schema;
 
-use PHPUnit\Framework\TestCase;
 use Spiral\JsonSchemaGenerator\Parser\SimpleType;
 use Spiral\JsonSchemaGenerator\Schema\Format;
 use Spiral\JsonSchemaGenerator\Schema\Property;
@@ -12,44 +11,48 @@ use Spiral\JsonSchemaGenerator\Schema\PropertyType;
 use Spiral\JsonSchemaGenerator\Schema\Type;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Actor;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Testo\Assert;
+use Testo\Assert\ExpectException;
+use Testo\Test;
 
-final class PropertyTest extends TestCase
+#[Test]
+final class PropertyTest
 {
     public function testPropertyOnlyRequiredParams(): void
     {
         $property = new Property(types: [new PropertyType(type: Type::String)]);
 
-        $this->assertEquals(['type' => 'string'], $property->jsonSerialize());
+        Assert::equals($property->jsonSerialize(), ['type' => 'string']);
     }
 
     public function testPropertyWithTitle(): void
     {
         $property = new Property(types: [new PropertyType(type: Type::String)], title: 'Some movie');
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'string',
             'title' => 'Some movie',
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithDescription(): void
     {
         $property = new Property(types: [new PropertyType(type: Type::String)], description: 'Some description');
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'string',
             'description' => 'Some description',
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithDefault(): void
     {
         $property = new Property(types: [new PropertyType(type: Type::String)], default: 'value');
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'string',
             'default' => 'value',
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithUnionType(): void
@@ -58,7 +61,7 @@ final class PropertyTest extends TestCase
             types: [new PropertyType(type: Movie::class), new PropertyType(type: Actor::class)],
         );
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'oneOf' => [
                 [
                     '$ref' => '#/definitions/Movie',
@@ -67,7 +70,7 @@ final class PropertyTest extends TestCase
                     '$ref' => '#/definitions/Actor',
                 ],
             ],
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithClassType(): void
@@ -76,9 +79,9 @@ final class PropertyTest extends TestCase
             types: [new PropertyType(type: Movie::class)],
         );
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             '$ref' =>  '#/definitions/Movie',
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithArrayTypeSingleClassElem(): void
@@ -88,13 +91,13 @@ final class PropertyTest extends TestCase
             title: 'Some movie',
         );
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'array',
             'title' => 'Some movie',
             'items' => [
                 '$ref' => '#/definitions/Movie',
             ],
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithArrayTypeSingleScalarElem(): void
@@ -104,13 +107,13 @@ final class PropertyTest extends TestCase
             title: 'Some movie',
         );
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'array',
             'title' => 'Some movie',
             'items' => [
                 'type' => 'string',
             ],
-        ], $property->jsonSerialize());
+        ]);
     }
 
     public function testPropertyWithArrayTypeMultipleElems(): void
@@ -120,7 +123,7 @@ final class PropertyTest extends TestCase
             title: 'Some movie',
         );
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'array',
             'title' => 'Some movie',
             'items' => [
@@ -133,12 +136,12 @@ final class PropertyTest extends TestCase
                     ],
                 ],
             ],
-        ], $property->jsonSerialize());
+        ]);
     }
 
+    #[ExpectException(\InvalidArgumentException::class)]
     public function testInvalidTypeException(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
         new SimpleType(name: 'foo', builtin: true);
     }
 
@@ -146,10 +149,10 @@ final class PropertyTest extends TestCase
     {
         $property = new Property(types: [new PropertyType(type: Type::String)], title: 'Homepage', format: Format::Uri);
 
-        $this->assertEquals([
+        Assert::equals($property->jsonSerialize(), [
             'type' => 'string',
             'title' => 'Homepage',
             'format' => 'uri',
-        ], $property->jsonSerialize());
+        ]);
     }
 }

@@ -16,6 +16,7 @@ final readonly class Reference implements \JsonSerializable
         private string $className,
     ) {}
 
+    #[\Override]
     public function jsonSerialize(): string
     {
         $pos = \strrpos($this->className, '\\');
