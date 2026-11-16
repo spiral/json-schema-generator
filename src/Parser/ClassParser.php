@@ -144,6 +144,11 @@ final class ClassParser implements ClassParserInterface
             throw new InvalidTypeException();
         }
 
+        // property-info prefers the PHPDoc type, which may omit the `null` the native type allows.
+        if ($property->getType()?->allowsNull() === true && !$type->isNullable()) {
+            $type = TypeInfoType::nullable($type);
+        }
+
         return $this->createType($type);
     }
 

@@ -73,7 +73,6 @@ final class ReadmeExamplesTest
         ]);
     }
 
-    #[Skip('The nullable `movies` becomes required, see https://github.com/spiral/json-schema-generator/issues/48')]
     public function arrayTypeAnnotations(): void
     {
         self::assertSchema(Actor::class, [

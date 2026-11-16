@@ -9,6 +9,7 @@ use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Actor;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\FlexibleValue;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Library;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
+use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\NullableCollection;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\PropertyVisibility;
 use Testo\Assert;
 use Testo\Test;
@@ -351,6 +352,19 @@ final class GeneratorTest
         $schema = (new Generator())->generate(PropertyVisibility::class)->jsonSerialize();
 
         Assert::same(\array_keys($schema['properties']), ['public']);
+    }
+
+    public function testNativeNullabilitySurvivesPhpDocTypeWithoutNull(): void
+    {
+        $schema = (new Generator())->generate(NullableCollection::class)->jsonSerialize();
+
+        Assert::same($schema['properties']['tags'], [
+            'oneOf' => [
+                ['type' => 'array', 'items' => ['type' => 'string']],
+                ['type' => 'null'],
+            ],
+        ]);
+        Assert::false(isset($schema['required']));
     }
 
     public function testSchemaIsCachedPerClass(): void
