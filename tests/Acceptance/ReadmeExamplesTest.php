@@ -16,7 +16,6 @@ use Spiral\JsonSchemaGenerator\Tests\Acceptance\Readme\Product;
 use Spiral\JsonSchemaGenerator\Tests\Acceptance\Readme\User;
 use Spiral\JsonSchemaGenerator\Tests\Acceptance\Readme\ValidatedUser;
 use Testo\Assert;
-use Testo\Skip;
 use Testo\Test;
 
 /**
@@ -305,7 +304,6 @@ final class ReadmeExamplesTest
         ]));
     }
 
-    #[Skip('A mixed property renders as `[]`, see https://github.com/spiral/json-schema-generator/issues/49')]
     public function additionalPropertiesValueObjectDefinition(): void
     {
         Assert::same(self::generate(DynamicConfig::class)['definitions']['ValueObject'], self::normalize([

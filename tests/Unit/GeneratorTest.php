@@ -8,6 +8,7 @@ use Spiral\JsonSchemaGenerator\Generator;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Actor;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\FlexibleValue;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Library;
+use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\MixedValue;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\Movie;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\NullableCollection;
 use Spiral\JsonSchemaGenerator\Tests\Unit\Fixture\PropertyVisibility;
@@ -365,6 +366,13 @@ final class GeneratorTest
             ],
         ]);
         Assert::false(isset($schema['required']));
+    }
+
+    public function testMixedPropertyIsAnyValueSchema(): void
+    {
+        $json = \json_encode((new Generator())->generate(MixedValue::class));
+
+        Assert::same($json, '{"type":"object","properties":{"value":{}},"required":["value"]}');
     }
 
     public function testSchemaIsCachedPerClass(): void

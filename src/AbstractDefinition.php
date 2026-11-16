@@ -37,7 +37,8 @@ abstract class AbstractDefinition implements \JsonSerializable
         // Building properties
         $required = [];
         foreach ($this->properties as $name => $property) {
-            $schema['properties'][$name] = $property->jsonSerialize();
+            // An unconstrained property (e.g. `mixed`) is the "any value" schema `{}`, not the JSON array `[]`.
+            $schema['properties'][$name] = $property->jsonSerialize() ?: new \stdClass();
 
             if ($property->required) {
                 $required[] = $name;
