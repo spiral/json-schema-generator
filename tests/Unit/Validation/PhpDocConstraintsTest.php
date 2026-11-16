@@ -61,6 +61,15 @@ final class PhpDocConstraintsTest
         ]);
     }
 
+    public function testTupleShapeKeepsArraySchema(): void
+    {
+        $tuple = self::property('tuple');
+
+        // `items` depends on the symfony/property-info version, the shape constraint must not apply.
+        Assert::same($tuple['type'], 'array');
+        Assert::false(\array_key_exists('properties', $tuple));
+    }
+
     private static function property(string $name): array
     {
         return (new Generator())->generate(PhpDocConstraints::class)->jsonSerialize()['properties'][$name];
