@@ -20,4 +20,6 @@ jobs:
       os: >-
         ['ubuntu-latest']
       php: >-
-        ['8.3']
+        ['8.4']
+      bin-tool: psalm
+      command: composer psalm:ci

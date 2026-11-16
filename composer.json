@@ -46,8 +46,7 @@
     "bamarni/composer-bin-plugin": "^1.8",
     "rector/rector": "^2.0",
     "testo/bridge-infection": "^0.1.9",
-    "testo/testo": "^0.10.56",
-    "vimeo/psalm": "^6.10 || ^7"
+    "testo/testo": "^0.10.56"
   },
   "autoload": {
     "psr-4": {
@@ -70,11 +69,12 @@
       "@putenv XDEBUG_MODE=coverage",
       "infection --ansi --threads=max --logger-github --show-mutations=0 --min-msi=80 --min-covered-msi=80"
     ],
-    "psalm": "psalm",
+    "psalm": "psalm -c vendor-bin/psalm/psalm.xml",
+    "psalm:baseline": "psalm -c vendor-bin/psalm/psalm.xml --set-baseline=vendor-bin/psalm/psalm-baseline.xml",
+    "psalm:ci": "psalm -c vendor-bin/psalm/psalm.xml --output-format=github --shepherd --show-info=false --stats --threads=4",
     "refactor": "rector process --config=rector.php",
     "refactor:ci": "rector process --config=rector.php --dry-run --ansi",
-    "test": "testo",
-    "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml"
+    "test": "testo"
   },
   "config": {
     "sort-packages": true,
