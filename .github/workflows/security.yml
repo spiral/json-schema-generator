@@ -54,7 +54,7 @@ jobs:
         run: composer validate --ansi --strict
 
       - name: 📥 Install dependencies with composer
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: ${{ matrix.dependencies }}
 
